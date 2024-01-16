@@ -18,6 +18,7 @@ dongseo
 
 ### PR 규칙 
 다같이 작성한 코드가 아닌 각자 수정한 부분이 있다면 설명을 곁들인 PR날리기
+만약 이슈 생기면 issue 열어서 알려주세요!
 
 ### git convention
  [type] : commit message
