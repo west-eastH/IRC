@@ -1,22 +1,22 @@
 # IRC - Internet Relay Chat
 
 ### 일정
-매일 13시 ~ 17시 coreTime (탁구 금지)
-일주일에 한번 유동적으로 휴일 정하기 
+매일 13시 ~ 17시 coreTime (탁구 금지) </br>
+일주일에 한번 유동적으로 휴일 정하기  </br>
 1월 18일까지 subject 탐독
 
 ### 목표
 2월 7일까지 구현 완료!
 
 ### Member
-jonhan
-phan
-hyuim
-dongseo
+jonhan </br>
+phan </br> 
+hyuim </br>
+dongseo </br>
 (hcho2..)
 
 ### PR 규칙 
-다같이 작성한 코드가 아닌 각자 수정한 부분이 있다면 설명을 곁들인 PR날리기
+다같이 작성한 코드가 아닌 각자 수정한 부분이 있다면 설명을 곁들인 PR날리기 </br>
 만약 이슈 생기면 issue 열어서 알려주세요!
 
 ### git convention
