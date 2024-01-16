@@ -1,5 +1,4 @@
-# IRC
-internet relay chat
+# IRC - Internet Relay Chat
 
 ### 일정
 매일 13시 ~ 17시 coreTime (탁구 금지)
