@@ -13,4 +13,4 @@ add_executable(irc
         main.cpp
         Server.cpp
         Server.hpp
-        socket.cpp)
+        socket.cpp User.hpp)

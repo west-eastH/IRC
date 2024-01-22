@@ -108,7 +108,7 @@ void Server::connect_client( std::vector<struct kevent> &changeList)
 
     change_events(changeList, client_socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
     change_events(changeList, client_socket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
-    clients[client_socket] = "";
+    clients[client_socket].setSendBuffer("");
 }
 
 void Server::parsing_command(struct kevent* curr_event)
@@ -125,8 +125,8 @@ void Server::parsing_command(struct kevent* curr_event)
     else
     {
         buf[n] = '\0';
-        clients[curr_event->ident] += buf;
-        std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident] << std::endl;
+        clients[curr_event->ident].setSendBuffer(clients[curr_event->ident].getSendBuffer() + buf);
+        std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident].getSendBuffer() << std::endl;
     }
 }
 
@@ -139,18 +139,18 @@ void Server::disconnect_client(int client_fd)
 
 void Server::execute_command(struct kevent *curr_event)
 {
-    std::map<int, std::string>::iterator it = clients.find(curr_event->ident);
+    std::map<int, User>::iterator it = clients.find(curr_event->ident);
     if (it != clients.end())
     {
-        if (clients[curr_event->ident] != "")
+        if (clients[curr_event->ident].getSendBuffer() != "")
         {
             int n;
-            if ((n = write(curr_event->ident, clients[curr_event->ident].c_str(), clients[curr_event->ident].size()) == -1))
+            if ((n = write(curr_event->ident, clients[curr_event->ident].getSendBuffer().c_str(), clients[curr_event->ident].getSendBuffer().size()) == -1))
             {
                 disconnect_client(curr_event->ident);
             }
             else
-                clients[curr_event->ident].clear();
+                clients[curr_event->ident].setSendBuffer("");
         }
     }
 }
