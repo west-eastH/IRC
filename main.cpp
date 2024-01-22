@@ -1,13 +1,8 @@
-int main (int argc, char *argv[])
+#include "Server.hpp"
+
+int main(int ac, char *av[])
 {
-	if (argc != 3)
-		return 1;
-	try
-	{
-		Irc(argv[0], argv[1]);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
+    Server server(ac, av);
+    server.start();
+    return 0;
 }
