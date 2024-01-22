@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "irc::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-irc-Debug-b38b4afe58a35b064836.json",
+					"jsonFile" : "target-irc-Debug-80a4663a70104b651553.json",
 					"name" : "irc",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/jonhan/42/irc/cmake-build-debug",
-		"source" : "/Users/jonhan/42/irc"
+		"build" : "/Users/jonhan/42/test2/cmake-build-debug",
+		"source" : "/Users/jonhan/42/test2"
 	},
 	"version" : 
 	{

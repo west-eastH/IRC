@@ -10,6 +10,8 @@
 #include <map>
 #include <string>
 
+#include "User.hpp"
+
 class Server{
     private:
         const static std::string _password;
@@ -22,11 +24,7 @@ class Server{
         void change_events(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
 
     public:
-        // std::map<int, UserInfo> users;
-        // std::map<std::string, Channel> channels;
-        // char clientBuffer[SOMAXCONN][BUFSIZ];
-        // char sendBuffer[SOMAXCONN][BUFSIZ];
-        std::map<int, std::string> clients;
+        std::map<int, User> clients;
         ~Server();
         Server(int ac, char **av);
         void start(void);
