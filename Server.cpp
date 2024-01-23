@@ -1,20 +1,30 @@
 #include "Server.hpp"
-const std::string Server::_password = "imrc";
-bool Server::isValid(int ac, char **av)
+//Command 객체로 이동해야함
+std::vector<std::string> Server::split(std::string input, char delimiter) {
+    std::vector<std::string> answer;
+    std::stringstream ss(input);
+    std::string temp;
+ 
+    while (getline(ss, temp, delimiter)) {
+        answer.push_back(temp);
+    }
+ 
+    return answer;
+}
+
+bool Server::isValid(char *port)
 {
     int tempPort;
-    if (ac != 3 || av[2] != _password)
-        return false;
-    tempPort = std::stoi(av[1]);
+    tempPort = std::stoi(port);
     if (tempPort < 0 || tempPort > 65535)
         return false;
     _port = tempPort;
     return true;
 }
 
-Server::Server(int ac, char **av) : _serverName("Reboot")
+Server::Server(char **av) : _serverName("Reboot"), _password(av[2])
 {
-    if (!isValid(ac, av))
+    if (!isValid(av[1]))
         exit(1);
     create();
 }
@@ -24,15 +34,15 @@ void Server::create(void)
     struct sockaddr_in serverAddr;
 
     if ((_socketFd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-        exit(1); // error
+        exit(1);
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(_port);
     if (bind(_socketFd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1)
-        exit(1); // error
+        exit(1);
     if (listen(_socketFd, 5) == -1)
-        exit(1); // error
+        exit(1);
     fcntl(_socketFd, F_SETFL, O_NONBLOCK);
 }
 
@@ -126,7 +136,23 @@ void Server::parsing_command(struct kevent* curr_event)
     {
         buf[n] = '\0';
         clients[curr_event->ident].setSendBuffer(clients[curr_event->ident].getSendBuffer() + buf);
-        std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident].getSendBuffer() << std::endl;
+		std::vector<std::string> temp_split = this->split(clients[curr_event->ident].getSendBuffer(), ' ');
+		if (clients[curr_event->ident].isActive() == 0)
+		{
+			if (temp_split.begin()->compare("PASS") == 0)
+				std::cout << "test" << std::endl; //Command 객체 checkPass()
+			else
+				std::cout << "test2" << std::endl; //Pass먼저 해야한다 아니면 실제 irc에서 에러출력 보고 적용
+		}
+		else
+		{
+			if (temp_split.begin()->compare("PASS") == 0)
+				//이제 각자 어쩌고 저쩌고 파싱
+			else if (temp_split.begin()->compare("JOIN") == 0)
+				//이제 각자 어쩌고 저쩌고 파싱
+			//etc..
+		}
+		//std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident].getSendBuffer() << std::endl;
     }
 }
 
