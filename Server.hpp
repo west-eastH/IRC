@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include "UserInfo.hpp"
+
 class Command;
 class Server{
     private:

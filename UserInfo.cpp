@@ -20,11 +20,15 @@ bool UserInfo::isActive() const {
     return _active;
 }
 
+bool UserInfo::isPass() const {
+    return _pass;
+}
+
 const std::string &UserInfo::getSendBuffer() const {
     return _sendBuffer;
 }
 
-UserInfo::UserInfo() : _nickName(""), _realName(""), _auth(false), _active(false)
+UserInfo::UserInfo() : _nickName("phan"), _realName("phan"), _auth(false), _active(false)
 {
     std::cout << "UserInfo constructor called" << std::endl;
 }

@@ -28,6 +28,7 @@ public:
     const std::string &getUserName() const;
     bool isAuth() const;
     bool isActive() const;
+	bool isPass() const;
     const std::string &getSendBuffer() const;
 
     void setFd(int fd);
