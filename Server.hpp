@@ -10,26 +10,29 @@
 #include <map>
 #include <string>
 
+#include <sstream>
+
 #include "User.hpp"
 
 class Server{
     private:
-        const static std::string _password;
         std::string _serverName;
+        const std::string _password;
         int _port;
-        int _socketFd;
+        uintptr_t _socketFd;
         void create(void);
         Server();
-        bool isValid(int ac, char **av);
+        bool isValid(char *port);
         void change_events(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
 
     public:
         std::map<int, User> clients;
         ~Server();
-        Server(int ac, char **av);
+        Server(char **av);
         void start(void);
         void connect_client( std::vector<struct kevent> &changeList);
         void parsing_command(struct kevent* curr_event);
         void disconnect_client(int client_fd);
         void execute_command(struct kevent* curr_event);
-}; 
+		std::vector<std::string> split(std::string input, char delimiter);
+};
