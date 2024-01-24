@@ -1,5 +1,6 @@
 #include "Server.hpp"
-//Command 객체로 이동해야함
+
+#include "Pass.hpp"
 std::vector<std::string> Server::split(std::string input, char delimiter) {
     std::vector<std::string> answer;
     std::stringstream ss(input);
@@ -62,6 +63,7 @@ void Server::change_events(std::vector<struct kevent>& changeList, uintptr_t ide
 
 void Server::start(void) 
 {
+	Command* cmd;
     int kq;
     if ((kq = kqueue()) == -1)
         exit(1); // error
@@ -74,6 +76,7 @@ void Server::start(void)
 
     int new_events;
     struct kevent* curr_event;
+		cmd = NULL;
 
     while (1)
     {
@@ -87,7 +90,7 @@ void Server::start(void)
             curr_event = &event_list[i];
             if (curr_event->flags & EV_ERROR)
             {
-                if (curr_event -> flags == _socketFd)
+                if (curr_event->flags == _socketFd)
                     exit (1);
                 else
                 {
@@ -99,11 +102,15 @@ void Server::start(void)
             {
                 if (curr_event->ident == _socketFd)
                     connect_client(changeList);
-                else if (clients.find(curr_event->ident) != clients.end())
-                    parsing_command(curr_event);
+                else if (clients.find(curr_event->ident) != clients.end() && !cmd)
+                    cmd = parsing_command(curr_event);
             }
-            else if (curr_event->filter == EVFILT_WRITE)
-                execute_command(curr_event);
+            else if (curr_event->filter == EVFILT_WRITE && cmd != NULL)
+			{
+                cmd->execute();
+				delete cmd;
+				cmd = NULL;
+			}
         }
         
     }
@@ -121,8 +128,9 @@ void Server::connect_client( std::vector<struct kevent> &changeList)
     clients[client_socket].setSendBuffer("");
 }
 
-void Server::parsing_command(struct kevent* curr_event)
+Command* Server::parsing_command(struct kevent* curr_event)
 {
+	Command* cmd = NULL;
     char buf[1024];
     int n = read(curr_event->ident, buf, sizeof(buf));
 
@@ -136,24 +144,12 @@ void Server::parsing_command(struct kevent* curr_event)
     {
         buf[n] = '\0';
         clients[curr_event->ident].setSendBuffer(clients[curr_event->ident].getSendBuffer() + buf);
-		std::vector<std::string> temp_split = this->split(clients[curr_event->ident].getSendBuffer(), ' ');
-		if (clients[curr_event->ident].isActive() == 0)
-		{
-			if (temp_split.begin()->compare("PASS") == 0)
-				std::cout << "test" << std::endl; //Command 객체 checkPass()
-			else
-				std::cout << "test2" << std::endl; //Pass먼저 해야한다 아니면 실제 irc에서 에러출력 보고 적용
-		}
-		else
-		{
-			if (temp_split.begin()->compare("PASS") == 0)
-				//이제 각자 어쩌고 저쩌고 파싱
-			else if (temp_split.begin()->compare("JOIN") == 0)
-				//이제 각자 어쩌고 저쩌고 파싱
-			//etc..
-		}
+		cmd = createCommand(curr_event->ident);
+		
 		//std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident].getSendBuffer() << std::endl;
+
     }
+	return (cmd);
 }
 
 void Server::disconnect_client(int client_fd)
@@ -163,20 +159,52 @@ void Server::disconnect_client(int client_fd)
     clients.erase(client_fd);
 }
 
-void Server::execute_command(struct kevent *curr_event)
+//void Server::execute_command(struct kevent *curr_event, Command* cmd)
+//{
+//    std::map<int, UserInfo>::iterator it = clients.find(curr_event->ident);
+//    if (it != clients.end())
+//    {
+//        if (clients[curr_event->ident].getSendBuffer() != "")
+//        {
+//            int n;
+//            if ((n = write(curr_event->ident, clients[curr_event->ident].getSendBuffer().c_str(), clients[curr_event->ident].getSendBuffer().size()) == -1))
+//            {
+//                disconnect_client(curr_event->ident);
+//            }
+//            else
+//                clients[curr_event->ident].setSendBuffer("");
+//        }
+//    }
+//}
+Command* Server::createCommand(uintptr_t fd)
 {
-    std::map<int, User>::iterator it = clients.find(curr_event->ident);
-    if (it != clients.end())
-    {
-        if (clients[curr_event->ident].getSendBuffer() != "")
-        {
-            int n;
-            if ((n = write(curr_event->ident, clients[curr_event->ident].getSendBuffer().c_str(), clients[curr_event->ident].getSendBuffer().size()) == -1))
-            {
-                disconnect_client(curr_event->ident);
-            }
-            else
-                clients[curr_event->ident].setSendBuffer("");
-        }
-    }
+	Command *cmd;
+	std::vector<std::string> temp_split = this->split(clients[fd].getSendBuffer(), ' ');
+	if (temp_split.begin()->compare("PASS") == 0)
+		cmd = new Pass(clients, fd, temp_split, _password);
+	//else if (temp_split.begin()->compare("NICK") == 0)
+	//	cmd = new Nick();
+	//else if (temp_split.begin()->compare("USER") == 0)
+	//	cmd = new User();
+	//else if (temp_split.begin()->compare("JOIN") == 0)
+	//	cmd = new Join();
+	//else if (temp_split.begin()->compare("INVITE") == 0)
+	//	cmd = new Invite();
+	//else if (temp_split.begin()->compare("QUIT") == 0)
+	//	cmd = new Quit();
+	//else if (temp_split.begin()->compare("PART") == 0)
+	//	cmd = new Part();
+	//else if (temp_split.begin()->compare("PRIVMSG") == 0)
+	//	cmd = new Privmsg();
+	//else if (temp_split.begin()->compare("KICK") == 0)
+	//	cmd = new Kick();
+	//else if (temp_split.begin()->compare("OPER") == 0)
+	//	cmd = new Oper();
+	//else if (temp_split.begin()->compare("MODE") == 0)
+	//	cmd = new Mode();
+	//else if (temp_split.begin()->compare("TOPIC") == 0)
+	//	cmd = new Topic();
+	else
+		return 0;
+	return cmd;
 }

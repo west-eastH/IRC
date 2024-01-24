@@ -1,25 +1,25 @@
-#ifndef IRC_USER_HPP
-#define IRC_USER_HPP
+#pragma once
 
 #include <iostream>
 #include <map>
 
-class User{
+class UserInfo{
 public:
 
 private:
-    int fd;
+    int _fd;
     std::string _nickName;
     std::string _realName;
     std::string _userName;
     bool _auth;
+	bool _pass;
     bool _active;
 
     std::string _sendBuffer;
 
 public:
-    User();
-    virtual ~User();
+    UserInfo();
+    virtual ~UserInfo();
 
     std::map<std::string, bool> channels;
 
@@ -36,8 +36,8 @@ public:
     void setUserName(const std::string &userName);
     void setAuth(bool auth);
     void setActive(bool active);
+	void setPass(bool pass);
     void setSendBuffer(const std::string &sendBuffer);
 
 };
 
-#endif //IRC_USER_HPP
