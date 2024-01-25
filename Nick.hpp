@@ -8,5 +8,5 @@ class Nick : public Command
 		Nick(std::map<int, UserInfo> &clients, uintptr_t fd, std::vector<std::string> temp_split);
 		~Nick();
 
-		void execute();
+		virtual void execute();
 };

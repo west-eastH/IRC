@@ -3,19 +3,27 @@
 #include "Nick.hpp"
 #include "User.hpp"
 
-std::vector<std::string> Server::split(std::string input, char delimiter) {
+Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password)
+{
+    if (!isValidPort(port))
+        throw std::invalid_argument("Wrong port!");
+    create();
+}
+
+Server::~Server() {}
+
+std::vector<std::string> Server::split(std::string input, char delimiter)
+{
     std::vector<std::string> answer;
     std::stringstream ss(input);
     std::string temp;
  
-    while (getline(ss, temp, delimiter)) {
-        answer.push_back(temp);
-    }
- 
+    while (getline(ss, temp, delimiter))
+        answer.push_back(temp); 
     return answer;
 }
 
-bool Server::isValid(char *port)
+bool Server::isValidPort(char *port)
 {
     int tempPort;
     tempPort = std::stoi(port);
@@ -25,37 +33,25 @@ bool Server::isValid(char *port)
     return true;
 }
 
-Server::Server(char **av) : _serverName("Reboot"), _password(av[2])
-{
-    if (!isValid(av[1]))
-        exit(1);
-    create();
-}
-
 void Server::create(void)
 {
     struct sockaddr_in serverAddr;
 
     if ((_socketFd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-        exit(1);
+        throw std::runtime_error("server socket error");
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(_port);
     if (bind(_socketFd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1)
-        exit(1);
-    if (listen(_socketFd, 5) == -1)
-        exit(1);
+        throw std::runtime_error("server bind error");
+    if (listen(_socketFd, 10) == -1)
+        throw std::runtime_error("server listen error");
     fcntl(_socketFd, F_SETFL, O_NONBLOCK);
 }
 
-Server::~Server()
-{
 
-}
-
-
-void Server::change_events(std::vector<struct kevent>& changeList, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata)
+void Server::changeEvents(std::vector<struct kevent>& changeList, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata)
 {
     struct kevent tempEvent;
 
@@ -65,165 +61,155 @@ void Server::change_events(std::vector<struct kevent>& changeList, uintptr_t ide
 
 void Server::start(void) 
 {
-	Command* cmd;
-    int kq;
-    if ((kq = kqueue()) == -1)
-        exit(1); // error
-
+    int kq = 0;
+    int newEvents = 0;
+	Command* cmd = NULL;
+    struct kevent	eventList[8];
+    struct kevent*	currEvent = NULL;
     std::vector<struct kevent> changeList;
-    struct kevent event_list[8];
 
-    change_events(changeList, _socketFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    if ((kq = kqueue()) == -1)
+        throw std::runtime_error("kqueue error");
+
+    changeEvents(changeList, _socketFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
     std::cout << "echo server started" << std::endl;
-
-    int new_events;
-    struct kevent* curr_event;
-		cmd = NULL;
 
     while (1)
     {
-        new_events = kevent(kq, &changeList[0], changeList.size(), event_list, 8, NULL);
-        if (new_events == -1)
-            exit (1);
+        newEvents = kevent(kq, &changeList[0], changeList.size(), eventList, 8, NULL);
+        if (newEvents == -1)
+            throw std::runtime_error("event error");
         changeList.clear();
-        
-        for (int i = 0; i < new_events; i++)
+        for (int i = 0; i < newEvents; i++)
         {
-            curr_event = &event_list[i];
-            if (curr_event->flags & EV_ERROR)
+            currEvent = &eventList[i];
+            if (currEvent->flags & EV_ERROR)
             {
-                if (curr_event->flags == _socketFd)
-                    exit (1);
+                if (currEvent->flags == _socketFd)
+                    throw std::runtime_error("event error");
                 else
                 {
                     std::cerr << "client socket error" << std::endl;
-                    disconnect_client(curr_event->ident);
+                    disconnectClient(currEvent->ident);
                 }
             }
-            else if (curr_event->filter == EVFILT_READ)
+            else if (currEvent->filter == EVFILT_READ)
             {
-				// std::cout << "read\n";
-                if (curr_event->ident == _socketFd)
-                    connect_client(changeList);
-                else if (clients.find(curr_event->ident) != clients.end() && !cmd)
-                    cmd = parsing_command(*curr_event);
+                if (currEvent->ident == _socketFd)
+                    connectClient(changeList);
+                else if (clients.find(currEvent->ident) != clients.end() && !cmd)
+                    cmd = parsingCommand(*currEvent);
             }
-            else if (curr_event->filter == EVFILT_WRITE && cmd != NULL)
+            else if (currEvent->filter == EVFILT_WRITE && cmd != NULL && currEvent->ident == cmd->_fd)
 			{
-				// std::cout << "write\n";
-                cmd->execute();
-				std::cout << "cmd fd : " << cmd->_fd << ", curr_event fd : " << curr_event->ident << std::endl;
-				clients[cmd->_fd].setSendBuffer("");
+				try
+				{
+                	cmd->execute();
+				}
+				catch(const std::exception& e)
+				{
+					std::string errMsg = e.what();
+					errMsg += "\n";
+					send(cmd->_fd, errMsg.c_str(), errMsg.length(), 0);
+				}
+				
+				clients[cmd->_fd].sendBuffer.clear();
 				delete cmd;
 				cmd = NULL;
-				// std::cout << "curr id: " << curr_event->ident << " buffer : " << clients[curr_event->ident].getSendBuffer() << std::endl;
-				// std::cout << "clear" << std::endl;
 			}
         }
         
     }
 }
 
-void Server::connect_client( std::vector<struct kevent> &changeList)
+void Server::connectClient( std::vector<struct kevent> &changeList)
 {
     int client_socket;
     if ((client_socket = accept(_socketFd, NULL, NULL)) == -1) 
-        exit(1);
+        throw std::runtime_error("client connect error");
     fcntl(client_socket, F_SETFL, O_NONBLOCK);
 
-    change_events(changeList, client_socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-    change_events(changeList, client_socket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
-    clients[client_socket].setSendBuffer("");
+    changeEvents(changeList, client_socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    changeEvents(changeList, client_socket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    clients[client_socket].sendBuffer.clear();
 }
 
-Command* Server::parsing_command(struct kevent& curr_event)
+Command* Server::parsingCommand(struct kevent& currEvent)
 {
 	Command* cmd = NULL;
     char buf[1024];
-    int n = recv(curr_event.ident, buf, sizeof(buf), 0);
+    int n = recv(currEvent.ident, buf, sizeof(buf), 0);
+	std::vector<std::string> tokenizedBuffer;
 
-    if (n<=0)
+	if (n < 0)
+        throw std::runtime_error("receive error");
+    if (n == 0)
     {
-        if (n < 0)
-            exit(1);
-        disconnect_client(curr_event.ident);
+        disconnectClient(currEvent.ident);
 		return NULL;
     }
-    else    {
-        buf[n] = '\0';
-        clients[curr_event.ident].setSendBuffer(clients[curr_event.ident].getSendBuffer() + buf);
-		cmd = createCommand(curr_event.ident);
-		
-		//std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident].getSendBuffer() << std::endl;
-
-    }
-	if (!cmd)
-		clients[curr_event.ident].setSendBuffer("");
-	return (cmd);
+	buf[n] = '\0';
+	clients[currEvent.ident].sendBuffer += buf;
+	
+	try
+	{
+		splitBuff(currEvent.ident, tokenizedBuffer);
+		cmd = createCommand(currEvent.ident, tokenizedBuffer);	
+	}
+	catch(int e)
+	{
+		clients[currEvent.ident].sendBuffer.clear();
+		return NULL;
+	}
+	return cmd;
 }
 
-void Server::disconnect_client(int client_fd)
+void Server::disconnectClient(int client_fd)
 {
     std::cout << client_fd << " : disconnect client" << std::endl;
     close(client_fd);
     clients.erase(client_fd);
 }
 
-//void Server::execute_command(struct kevent *curr_event, Command* cmd)
-//{
-//    std::map<int, UserInfo>::iterator it = clients.find(curr_event->ident);
-//    if (it != clients.end())
-//    {
-//        if (clients[curr_event->ident].getSendBuffer() != "")
-//        {
-//            int n;
-//            if ((n = write(curr_event->ident, clients[curr_event->ident].getSendBuffer().c_str(), clients[curr_event->ident].getSendBuffer().size()) == -1))
-//            {
-//                disconnect_client(curr_event->ident);
-//            }
-//            else
-//                clients[curr_event->ident].setSendBuffer("");
-//        }
-//    }
-//}
-Command* Server::createCommand(uintptr_t fd)
+void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 {
-	Command *cmd;
-	std::string buff = clients[fd].getSendBuffer();
-	// std::cout << "fd : " << fd << " buff : " << buff  << " clients : " << clients[fd].getSendBuffer() << std::endl;
-	size_t pos = buff.find("\r\n");
+	size_t		pos = clients[fd].sendBuffer.find("\r\n");
 	if (pos != std::string::npos)
-		buff.erase(pos);
-	clients[fd].setSendBuffer(buff);
-	std::vector<std::string> temp_split = this->split(buff, ' ');
-	if (temp_split.size() == 0)
-		return NULL;
-	std::cout << "fd : " << fd << " command begin : " << temp_split[0] << std::endl;
-	if (temp_split.begin()->compare("PASS") == 0)
-		cmd = new Pass(clients, fd, temp_split, _password);
-	else if (temp_split.begin()->compare("NICK") == 0)
-		cmd = new Nick(clients, fd, temp_split);
-	else if (temp_split.begin()->compare("USER") == 0)
-		cmd = new User(clients, fd, temp_split);
-	//else if (temp_split.begin()->compare("JOIN") == 0)
+		clients[fd].sendBuffer.erase(pos);
+	buff = this->split(clients[fd].sendBuffer, ' ');
+	if (buff.size() == 0)
+		throw(1);
+}
+
+Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
+{
+	Command*	cmd	= NULL;
+	
+	if (buff.begin()->compare("PASS") == 0)
+		cmd = new Pass(clients, fd, buff, _password);
+	else if (buff.begin()->compare("NICK") == 0)
+		cmd = new Nick(clients, fd, buff);
+	else if (buff.begin()->compare("USER") == 0)
+		cmd = new User(clients, fd, buff);
+	//else if (buff.begin()->compare("JOIN") == 0)
 	//	cmd = new Join();
-	//else if (temp_split.begin()->compare("INVITE") == 0)
+	//else if (buff.begin()->compare("INVITE") == 0)
 	//	cmd = new Invite();
-	//else if (temp_split.begin()->compare("QUIT") == 0)
+	//else if (buff.begin()->compare("QUIT") == 0)
 	//	cmd = new Quit();
-	//else if (temp_split.begin()->compare("PART") == 0)
+	//else if (buff.begin()->compare("PART") == 0)
 	//	cmd = new Part();
-	//else if (temp_split.begin()->compare("PRIVMSG") == 0)
+	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
-	//else if (temp_split.begin()->compare("KICK") == 0)
+	//else if (buff.begin()->compare("KICK") == 0)
 	//	cmd = new Kick();
-	//else if (temp_split.begin()->compare("OPER") == 0)
+	//else if (buff.begin()->compare("OPER") == 0)
 	//	cmd = new Oper();
-	//else if (temp_split.begin()->compare("MODE") == 0)
+	//else if (buff.begin()->compare("MODE") == 0)
 	//	cmd = new Mode();
-	//else if (temp_split.begin()->compare("TOPIC") == 0)
+	//else if (buff.begin()->compare("TOPIC") == 0)
 	//	cmd = new Topic();
 	else
-		return 0;
+		throw(1);
 	return cmd;
 }

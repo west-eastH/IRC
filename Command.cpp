@@ -1,16 +1,11 @@
-
 #include "Command.hpp"
 
 Command::Command(std::map<int, UserInfo>& clients, uintptr_t fd, std::vector<std::string> temp_split) 
-	: _parsedCommand(temp_split), _clients(clients), _fd(fd), _curUser(clients[fd])
-{
-} 
+	:  _parsedCommand(temp_split), _clients(clients), _curUser(clients[fd]), _fd(fd) {}
 
-Command::~Command()
-{
-}
+Command::~Command() {}
 
-void Command::putString(int fd, std::string str) const
+void Command::putString(const int fd, const std::string& str) const
 {
 	write(fd, str.c_str(), str.length());
 }
@@ -23,6 +18,5 @@ int Command::findNick(const std::string& nick) const
 		if (it->second.getNickName() == nick)
 			return it->first;
 	}
-	
 	return -1;
 }

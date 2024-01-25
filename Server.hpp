@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/event.h>
 #include <string>
+#include <exception>
 
 #include <sstream>
 
@@ -17,24 +18,29 @@
 class Command;
 class Server{
     private:
-        std::string _serverName;
-        const std::string _password;
-        int _port;
-        uintptr_t _socketFd;
+        std::string			_serverName;
+        const std::string	_password;
+        int					_port;
+        uintptr_t			_socketFd;
+
         void create(void);
-        Server();
-        bool isValid(char *port);
-        void change_events(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
+        bool isValidPort(char* port);
+        void changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
+
+		void		connectClient(std::vector<struct kevent>& changeList);
+        void		disconnectClient(int clientFd);
+		void		splitBuff(uintptr_t fd, std::vector<std::string>& buff);
+        void		executeCommand(struct kevent* currEvent, Command* cmd);
+        Command*	parsingCommand(struct kevent& currEvent);
+		Command*	createCommand(uintptr_t fd, std::vector<std::string>& buff);
+		std::vector<std::string> split(std::string input, char delimiter);
 
     public:
-        std::map<int, UserInfo> clients;
+
+        Server(char* port, char* password);
         ~Server();
-        Server(char **av);
-        void start(void);
-        void connect_client( std::vector<struct kevent> &changeList);
-        Command* parsing_command(struct kevent& curr_event);
-        void disconnect_client(int client_fd);
-        void execute_command(struct kevent* curr_event, Command* cmd);
-		std::vector<std::string> split(std::string input, char delimiter);
-		Command* createCommand(uintptr_t fd);
+
+        void	start(void);
+
+        std::map<int, UserInfo>	clients;
 };
