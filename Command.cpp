@@ -14,3 +14,15 @@ void Command::putString(int fd, std::string str) const
 {
 	write(fd, str.c_str(), str.length());
 }
+
+int Command::findNick(const std::string& nick) const
+{
+	std::map<int ,UserInfo>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second.getNickName() == nick)
+			return it->first;
+	}
+	
+	return -1;
+}

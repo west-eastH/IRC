@@ -12,7 +12,7 @@ User::~User()
 
 void User::execute()
 {
-	if (_curUser.isPass() == 0)
+	if (_curUser.isPass() == 0 || _curUser.isActive() == 1)
 		return ;
 
 	if (_parsedCommand.size() < 5)

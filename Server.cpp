@@ -106,15 +106,18 @@ void Server::start(void)
                 if (curr_event->ident == _socketFd)
                     connect_client(changeList);
                 else if (clients.find(curr_event->ident) != clients.end() && !cmd)
-                    cmd = parsing_command(curr_event);
+                    cmd = parsing_command(*curr_event);
             }
             else if (curr_event->filter == EVFILT_WRITE && cmd != NULL)
 			{
 				// std::cout << "write\n";
                 cmd->execute();
+				std::cout << "cmd fd : " << cmd->_fd << ", curr_event fd : " << curr_event->ident << std::endl;
+				clients[cmd->_fd].setSendBuffer("");
 				delete cmd;
 				cmd = NULL;
-				clients[curr_event->ident].setSendBuffer("");
+				// std::cout << "curr id: " << curr_event->ident << " buffer : " << clients[curr_event->ident].getSendBuffer() << std::endl;
+				// std::cout << "clear" << std::endl;
 			}
         }
         
@@ -133,29 +136,29 @@ void Server::connect_client( std::vector<struct kevent> &changeList)
     clients[client_socket].setSendBuffer("");
 }
 
-Command* Server::parsing_command(struct kevent* curr_event)
+Command* Server::parsing_command(struct kevent& curr_event)
 {
 	Command* cmd = NULL;
     char buf[1024];
-    int n = recv(curr_event->ident, buf, sizeof(buf), 0);
+    int n = recv(curr_event.ident, buf, sizeof(buf), 0);
 
     if (n<=0)
     {
         if (n < 0)
             exit(1);
-        disconnect_client(curr_event->ident);
+        disconnect_client(curr_event.ident);
 		return NULL;
     }
     else    {
         buf[n] = '\0';
-        clients[curr_event->ident].setSendBuffer(clients[curr_event->ident].getSendBuffer() + buf);
-		cmd = createCommand(curr_event->ident);
+        clients[curr_event.ident].setSendBuffer(clients[curr_event.ident].getSendBuffer() + buf);
+		cmd = createCommand(curr_event.ident);
 		
 		//std::cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident].getSendBuffer() << std::endl;
 
     }
 	if (!cmd)
-		clients[curr_event->ident].setSendBuffer("");
+		clients[curr_event.ident].setSendBuffer("");
 	return (cmd);
 }
 
@@ -187,6 +190,7 @@ Command* Server::createCommand(uintptr_t fd)
 {
 	Command *cmd;
 	std::string buff = clients[fd].getSendBuffer();
+	// std::cout << "fd : " << fd << " buff : " << buff  << " clients : " << clients[fd].getSendBuffer() << std::endl;
 	size_t pos = buff.find("\r\n");
 	if (pos != std::string::npos)
 		buff.erase(pos);
@@ -194,7 +198,7 @@ Command* Server::createCommand(uintptr_t fd)
 	std::vector<std::string> temp_split = this->split(buff, ' ');
 	if (temp_split.size() == 0)
 		return NULL;
-	std::cout << "command begin : " << temp_split[0] << std::endl;
+	std::cout << "fd : " << fd << " command begin : " << temp_split[0] << std::endl;
 	if (temp_split.begin()->compare("PASS") == 0)
 		cmd = new Pass(clients, fd, temp_split, _password);
 	else if (temp_split.begin()->compare("NICK") == 0)

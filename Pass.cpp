@@ -9,13 +9,12 @@ Pass::Pass(std::map<int, UserInfo> &clients, uintptr_t fd, std::vector<std::stri
 Pass::~Pass()
 {
 }
-
 void Pass::execute()
 {
 	if (_curUser.isActive() == 0)
 	{
 		if (_parsedCommand.size() != 2)
-			putString(_fd, "Wrong Pass args.\n");
+			putString(_fd, _parsedCommand[0] + " :Not enough parameters\n");
 		else
 		{
 			if (_parsedCommand[1] == _password)

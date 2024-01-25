@@ -66,5 +66,7 @@ void UserInfo::setPass(bool pass) {
 }
 
 void UserInfo::setSendBuffer(const std::string &sendBuffer) {
-    _sendBuffer = sendBuffer;
+    if (sendBuffer == "")
+		_sendBuffer.clear();
+	_sendBuffer = sendBuffer;
 }

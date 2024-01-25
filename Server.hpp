@@ -32,7 +32,7 @@ class Server{
         Server(char **av);
         void start(void);
         void connect_client( std::vector<struct kevent> &changeList);
-        Command* parsing_command(struct kevent* curr_event);
+        Command* parsing_command(struct kevent& curr_event);
         void disconnect_client(int client_fd);
         void execute_command(struct kevent* curr_event, Command* cmd);
 		std::vector<std::string> split(std::string input, char delimiter);
