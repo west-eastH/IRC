@@ -15,23 +15,23 @@ void Pass::execute()
 	if (_curUser.isActive() == 0)
 	{
 		if (_parsedCommand.size() != 2)
-			write(_fd, "Wrong Pass args.\n", 17);
+			putString(_fd, "Wrong Pass args.\n");
 		else
 		{
 			if (_parsedCommand[1] == _password)
 			{
 				std::cout << _parsedCommand[1] << " == " << _password << std::endl;
 				_curUser.setPass(1);
-				write(_fd, "very good.\n", 12);
+				putString(_fd, "very good.\n");
 			}
 			else
 			{
 				std::cout << _parsedCommand[1] << " != " << _password << std::endl;
 				_curUser.setPass(0);
-				write(_fd, "not good.\n", 11);
+				putString(_fd, "not good.\n");
 			}
 		}
 	}
 	else
-		write(_fd, "Already Passed.\n", 16);
+		putString(_fd, "Already Passed.\n");
 }

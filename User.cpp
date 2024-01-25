@@ -17,7 +17,7 @@ void User::execute()
 
 	if (_parsedCommand.size() < 5)
 	{
-		write(_fd, "Wrong User args.\n", 18);
+		putString(_fd, "Wrong User args.\n");
 		return ;
 	}
 	else
@@ -25,7 +25,7 @@ void User::execute()
 		// <user> <mode> <unused> <realname>
 		if (_parsedCommand[4][0] != ':')
 		{
-			write(_fd, "Wrong realname args.\n", 22);
+			putString(_fd, "Wrong realname args.\n");
 			return ;
 		}
 		_curUser.setUserName(_parsedCommand[1]);
@@ -40,6 +40,6 @@ void User::execute()
 		_curUser.setActive(1);
 		std::string msg = "Set \nUsername : " + _curUser.getUserName();
 		msg += "\nrealname : " + _curUser.getRealName() + "\n";
-		write(_fd, msg.c_str(), msg.length());
+		putString(_fd, msg.c_str());
 	}
 }

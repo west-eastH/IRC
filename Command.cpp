@@ -9,3 +9,8 @@ Command::Command(std::map<int, UserInfo>& clients, uintptr_t fd, std::vector<std
 Command::~Command()
 {
 }
+
+void Command::putString(int fd, std::string str) const
+{
+	write(fd, str.c_str(), str.length());
+}

@@ -137,7 +137,7 @@ Command* Server::parsing_command(struct kevent* curr_event)
 {
 	Command* cmd = NULL;
     char buf[1024];
-    int n = read(curr_event->ident, buf, sizeof(buf));
+    int n = recv(curr_event->ident, buf, sizeof(buf), 0);
 
     if (n<=0)
     {
@@ -187,8 +187,14 @@ Command* Server::createCommand(uintptr_t fd)
 {
 	Command *cmd;
 	std::string buff = clients[fd].getSendBuffer();
-	buff.erase(std::find(buff.begin(), buff.end(), '\r'));
-	buff.erase(std::find(buff.begin(), buff.end(), '\n'));
+	size_t pos = buff.find("\r\n");
+	if (pos != std::string::npos)
+		buff.erase(pos);
+	else
+	{
+		std::cout << "buff : " << buff << std::endl;
+		return NULL;
+	}
 	std::vector<std::string> temp_split = this->split(buff, ' ');
 	if (temp_split.size() == 0)
 		return NULL;

@@ -12,4 +12,5 @@ class Command
 		Command(std::map<int, UserInfo>& clients, uintptr_t fd, std::vector<std::string> temp_split);
 		virtual ~Command();
 		virtual void execute() = 0;
+		void putString(int fd, std::string str) const;
 };
