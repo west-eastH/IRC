@@ -190,11 +190,7 @@ Command* Server::createCommand(uintptr_t fd)
 	size_t pos = buff.find("\r\n");
 	if (pos != std::string::npos)
 		buff.erase(pos);
-	else
-	{
-		std::cout << "buff : " << buff << std::endl;
-		return NULL;
-	}
+	clients[fd].setSendBuffer(buff);
 	std::vector<std::string> temp_split = this->split(buff, ' ');
 	if (temp_split.size() == 0)
 		return NULL;
