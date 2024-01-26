@@ -25,8 +25,6 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 	if (_userCount > _limit)
 	{
 		char msg;
-		msg = _userCount + '0';
-		send(fd, &msg, 1, 0);
 		throw std::runtime_error("this channel is full!");
 	}
 	_members[fd] = user;
