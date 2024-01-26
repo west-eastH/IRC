@@ -1,6 +1,6 @@
 #include "Join.hpp"
 
-Join::Join(std::map<int, UserInfo&>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
+Join::Join(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
 	: Command(clients, channels, fd, parsedCommand) {}
 
 Join::~Join() {}

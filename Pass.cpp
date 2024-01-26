@@ -1,6 +1,6 @@
 #include "Pass.hpp"
 
-Pass::Pass(std::map<int, UserInfo&>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand, std::string password)
+Pass::Pass(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand, std::string password)
 	: Command(clients, channels, fd, parsedCommand), _password(password) {}
 
 Pass::~Pass()

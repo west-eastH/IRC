@@ -12,7 +12,7 @@ private:
     std::string	_name;
     std::string	_key;
     std::string	_topic;
-	std::map<int, UserInfo>	_members;
+	std::map<int, UserInfo*>	_members;
 
 public:
     Channel(std::string name, std::string key);
