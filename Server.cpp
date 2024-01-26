@@ -186,7 +186,7 @@ void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 {
 	Command*	cmd	= NULL;
-	
+
 	if (buff.begin()->compare("PASS") == 0)
 		cmd = new Pass(clients, channels, fd, buff, _password);
 	else if (buff.begin()->compare("NICK") == 0)

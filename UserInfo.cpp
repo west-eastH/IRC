@@ -1,7 +1,13 @@
 #include "UserInfo.hpp"
 
-UserInfo::UserInfo() : _auth(false),  _pass(false),_active(false), _nickName("000"), _realName("000"), _userName("000")
+UserInfo::UserInfo() : _auth(false),  _pass(false),_active(false), _realName("default name"), _userName("default user")
 {
+	static int	_nickIdx = 0;
+	std::stringstream ss;
+    ss << "default nick" << _nickIdx;
+	_nickIdx++;
+    std::string nick = ss.str();
+    _nickName = nick;
     std::cout << "UserInfo constructor called" << std::endl;
 }
 
