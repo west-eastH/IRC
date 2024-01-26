@@ -1,7 +1,7 @@
 #include "Command.hpp"
 
-Command::Command(std::map<int, UserInfo>& clients, uintptr_t fd, std::vector<std::string> temp_split) 
-	:  _parsedCommand(temp_split), _clients(clients), _curUser(clients[fd]), _fd(fd) {}
+Command::Command(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand) 
+	:  _parsedCommand(parsedCommand), _clients(clients), _channels(channels), _curUser(clients[fd]), _fd(fd) {}
 
 Command::~Command() {}
 
@@ -17,6 +17,16 @@ int Command::findNick(const std::string& nick) const
 	{
 		if (it->second.getNickName() == nick)
 			return it->first;
+	}
+	return -1;
+}
+
+int	Command::findChannel(const std::string& name) const
+{
+	for (int i = 0; i < static_cast<int>(_channels.size()); i++)
+	{
+		if (_channels[i].getName() == name)
+			return i;
 	}
 	return -1;
 }

@@ -1,7 +1,7 @@
 #include "Nick.hpp"
 
-Nick::Nick(std::map<int, UserInfo> &clients, uintptr_t fd, std::vector<std::string> temp_split)
-	: Command(clients, fd, temp_split) {}
+Nick::Nick(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
+	: Command(clients, channels, fd, parsedCommand) {}
 
 Nick::~Nick() {}
 

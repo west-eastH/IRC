@@ -14,6 +14,7 @@
 #include <sstream>
 
 #include "UserInfo.hpp"
+#include "Channel.hpp"
 
 class Command;
 class Server{
@@ -25,7 +26,7 @@ class Server{
 
         void create(void);
         bool isValidPort(char* port);
-        void changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
+        void changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter);
 
 		void		connectClient(std::vector<struct kevent>& changeList);
         void		disconnectClient(int clientFd);
@@ -43,4 +44,5 @@ class Server{
         void	start(void);
 
         std::map<int, UserInfo>	clients;
+		std::vector<Channel>	channels;
 };

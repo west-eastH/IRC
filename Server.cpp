@@ -2,6 +2,7 @@
 #include "Pass.hpp"
 #include "Nick.hpp"
 #include "User.hpp"
+#include "Join.hpp"
 
 Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password)
 {
@@ -51,11 +52,11 @@ void Server::create(void)
 }
 
 
-void Server::changeEvents(std::vector<struct kevent>& changeList, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata)
+void Server::changeEvents(std::vector<struct kevent>& changeList, uintptr_t ident, int16_t filter)
 {
     struct kevent tempEvent;
 
-    EV_SET(&tempEvent, ident, filter, flags, fflags, data, udata);
+    EV_SET(&tempEvent, ident, filter, EV_ADD | EV_ENABLE, 0, 0, NULL);
     changeList.push_back(tempEvent);
 }
 
@@ -71,7 +72,7 @@ void Server::start(void)
     if ((kq = kqueue()) == -1)
         throw std::runtime_error("kqueue error");
 
-    changeEvents(changeList, _socketFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    changeEvents(changeList, _socketFd, EVFILT_READ);
     std::cout << "echo server started" << std::endl;
 
     while (1)
@@ -129,8 +130,8 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
         throw std::runtime_error("client connect error");
     fcntl(client_socket, F_SETFL, O_NONBLOCK);
 
-    changeEvents(changeList, client_socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-    changeEvents(changeList, client_socket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    changeEvents(changeList, client_socket, EVFILT_READ);
+    changeEvents(changeList, client_socket, EVFILT_WRITE);
     clients[client_socket].sendBuffer.clear();
 }
 
@@ -154,7 +155,8 @@ Command* Server::parsingCommand(struct kevent& currEvent)
 	try
 	{
 		splitBuff(currEvent.ident, tokenizedBuffer);
-		cmd = createCommand(currEvent.ident, tokenizedBuffer);	
+		cmd = createCommand(currEvent.ident, tokenizedBuffer);
+		std::cout << buf << std::endl;
 	}
 	catch(int e)
 	{
@@ -186,13 +188,13 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 	Command*	cmd	= NULL;
 	
 	if (buff.begin()->compare("PASS") == 0)
-		cmd = new Pass(clients, fd, buff, _password);
+		cmd = new Pass(clients, channels, fd, buff, _password);
 	else if (buff.begin()->compare("NICK") == 0)
-		cmd = new Nick(clients, fd, buff);
+		cmd = new Nick(clients, channels, fd, buff);
 	else if (buff.begin()->compare("USER") == 0)
-		cmd = new User(clients, fd, buff);
-	//else if (buff.begin()->compare("JOIN") == 0)
-	//	cmd = new Join();
+		cmd = new User(clients, channels, fd, buff);
+	else if (buff.begin()->compare("JOIN") == 0)
+		cmd = new Join(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("INVITE") == 0)
 	//	cmd = new Invite();
 	//else if (buff.begin()->compare("QUIT") == 0)

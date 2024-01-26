@@ -22,6 +22,8 @@ SRCS =	main.cpp \
 		Command.cpp \
 		Nick.cpp \
 		User.cpp \
+		Channel.cpp \
+		Join.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
