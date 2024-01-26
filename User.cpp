@@ -1,6 +1,6 @@
 #include "User.hpp"
 
-User::User(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
+User::User(std::map<int, UserInfo&>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
 	: Command(clients, channels, fd, parsedCommand) 
 {
 	 std::cout << "User constructor called" << std::endl;

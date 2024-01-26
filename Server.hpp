@@ -43,6 +43,6 @@ class Server{
 
         void	start(void);
 
-        std::map<int, UserInfo>	clients;
+        std::map<int, UserInfo&>	clients;
 		std::vector<Channel>	channels;
 };

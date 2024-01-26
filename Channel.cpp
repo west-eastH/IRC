@@ -1,7 +1,7 @@
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, std::string key) : _mode(0), _limit(2), _userCount(1), _name(name), _key(key) {
+Channel::Channel(std::string name, std::string key) : _mode(0), _limit(10), _userCount(1), _name(name), _key(key) {
 	_mode = 0;
 }
 
@@ -23,10 +23,7 @@ const std::string &Channel::getKey() const
 void	Channel::joinChannel(int fd, UserInfo& user)
 {
 	if (_userCount > _limit)
-	{
-		char msg;
 		throw std::runtime_error("this channel is full!");
-	}
 	_members[fd] = user;
 	_userCount++;
 	announce(user.getNickName() + " join " + _name + "Channel!\n");

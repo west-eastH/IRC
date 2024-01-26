@@ -1,6 +1,6 @@
 #include "Command.hpp"
 
-Command::Command(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand) 
+Command::Command(std::map<int, UserInfo&>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand) 
 	:  _parsedCommand(parsedCommand), _clients(clients), _channels(channels), _curUser(clients[fd]), _fd(fd) {}
 
 Command::~Command() {}
@@ -12,7 +12,7 @@ void Command::putString(const int fd, const std::string& str) const
 
 int Command::findNick(const std::string& nick) const
 {
-	std::map<int ,UserInfo>::iterator it;
+	std::map<int ,UserInfo&>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		if (it->second.getNickName() == nick)

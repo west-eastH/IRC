@@ -7,7 +7,7 @@ class Pass : public Command
 private:
 	std::string _password;
 public:
-	Pass(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> temp_split, std::string password);
+	Pass(std::map<int, UserInfo&>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> temp_split, std::string password);
 	~Pass();
 	void	execute();
 };
