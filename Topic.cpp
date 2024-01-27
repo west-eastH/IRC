@@ -1,7 +1,8 @@
 #include "Topic.hpp"
 
-Topic::Topic(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand, std::string password)
-	: Command(clients, channels, fd, parsedCommand), _password(password) {}
+Topic::Topic(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
+	: Command(clients, channels, fd, parsedCommand) {}
+
 
 Topic::~Topic()
 {
@@ -9,7 +10,6 @@ Topic::~Topic()
 void Topic::execute()
 {
 	int chIdx = -1;
-	int targetFd;
 	std::string msg;
 
 	if (_curUser.isActive() == false)
@@ -18,18 +18,15 @@ void Topic::execute()
 		throw std::runtime_error("Wrong topic args!");
 	if (_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
 		throw std::runtime_error("No exist User!!");
-	else
-	//topic
-	/* if ((targetFd = findNick(_parsedCommand[2])) == -1 || _clients[targetFd].channels.find(_parsedCommand[1]) == _clients[targetFd].channels.end())
-		throw std::runtime_error("They aren't on that channel!!");
-	if (_curUser.getNickName() == _clients[targetFd].getNickName())
-		throw std::runtime_error("Can not kick yourself!!");
-	_clients[targetFd].channels.erase(_parsedCommand[1]);
 	chIdx = findChannel(_parsedCommand[1]);
-	_channels[chIdx].kickMember(targetFd);
-	msg = "You got kicked out from " + _parsedCommand[1];
-	if (_parsedCommand.size() == 4)
-		msg += " (" + _parsedCommand[3] + ")";
-	msg += "\n";
-	send(targetFd, msg.c_str(), msg.length(), 0); */
+	if (_parsedCommand.size() == 2)
+	{
+		msg = _parsedCommand[1] + "'s topic is [" + _channels[chIdx].getTopic() + "]\n";
+		send(_fd, msg.c_str(), msg.length(), 0);
+		return ;
+	}
+	if (_curUser.channels[_parsedCommand[1]] == false)
+		throw std::runtime_error("You are not channel operator!!");
+	_channels[chIdx].setTopic(_parsedCommand[2]);
+	_channels[chIdx].announce("The channel's topic has been changed to '" + _parsedCommand[2] + "'.\n");
 }

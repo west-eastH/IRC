@@ -44,12 +44,12 @@ void	Channel::announce(const std::string msg)
 		send(it->first, msg.c_str(), msg.length(), 0);
 }
 
-void	setTopic(const std::string topic)
+void	Channel::setTopic(const std::string topic)
 {
 	_topic = topic;
 }
 
-const std::string& getTopic() const
+const std::string& Channel::getTopic() const
 {
 	return _topic;
 }

@@ -25,7 +25,8 @@ SRCS =	main.cpp \
 		Channel.cpp \
 		Join.cpp \
 		Kick.cpp \
-		Invite.cpp
+		Invite.cpp \
+		Topic.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

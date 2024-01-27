@@ -20,6 +20,7 @@ public:
 
 	const std::string &getName() const;
 	const std::string &getKey() const;
+	const std::string& getTopic() const;
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
 	void	announce(const std::string msg);
