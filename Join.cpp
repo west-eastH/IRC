@@ -8,19 +8,24 @@ Join::~Join() {}
 void Join::execute()
 {
 	int chIdx = -1;
+	bool oper = false;
 
 	if (_curUser.isActive() == false)
 		throw std::runtime_error("You need to login first");
 	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
-		throw std::runtime_error("Wrong Nick args!");
+		throw std::runtime_error("Wrong Join args!");
 	if (_parsedCommand[1][0] != '#')
 		throw std::runtime_error("Channel name have to start with '#'");
 	if (_parsedCommand.size() == 2)
 		_parsedCommand.push_back("");
 	if ((findChannel(_parsedCommand[1])) == -1)
+	{
 		_channels.push_back(Channel(_parsedCommand[1], _parsedCommand[2]));
+		oper = true;
+	}
 	chIdx = findChannel(_parsedCommand[1]);
 	if (_channels[chIdx].getKey() != _parsedCommand[2])
 		throw std::runtime_error("Wrong password!");
+	_curUser.channels[_parsedCommand[1]] = oper;
 	_channels[chIdx].joinChannel(_fd, _curUser);
 }

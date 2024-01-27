@@ -3,6 +3,7 @@
 #include "Nick.hpp"
 #include "User.hpp"
 #include "Join.hpp"
+#include "Kick.hpp"
 
 Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password)
 {
@@ -156,7 +157,6 @@ Command* Server::parsingCommand(struct kevent& currEvent)
 	{
 		splitBuff(currEvent.ident, tokenizedBuffer);
 		cmd = createCommand(currEvent.ident, tokenizedBuffer);
-		std::cout << buf << std::endl;
 	}
 	catch(int e)
 	{
@@ -195,6 +195,8 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new User(clients, channels, fd, buff);
 	else if (buff.begin()->compare("JOIN") == 0)
 		cmd = new Join(clients, channels, fd, buff);
+	else if (buff.begin()->compare("KICK") == 0)
+		cmd = new Kick(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("INVITE") == 0)
 	//	cmd = new Invite();
 	//else if (buff.begin()->compare("QUIT") == 0)
@@ -203,8 +205,6 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 	//	cmd = new Part();
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
-	//else if (buff.begin()->compare("KICK") == 0)
-	//	cmd = new Kick();
 	//else if (buff.begin()->compare("OPER") == 0)
 	//	cmd = new Oper();
 	//else if (buff.begin()->compare("MODE") == 0)

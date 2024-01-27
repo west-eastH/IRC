@@ -23,7 +23,8 @@ SRCS =	main.cpp \
 		Nick.cpp \
 		User.cpp \
 		Channel.cpp \
-		Join.cpp
+		Join.cpp \
+		Kick.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

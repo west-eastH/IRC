@@ -1,12 +1,12 @@
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, std::string key) : _mode(0), _limit(10), _userCount(1), _name(name), _key(key) {
+Channel::Channel(std::string name, std::string key) : _mode(0), _limit(10), _userCount(0), _name(name), _key(key) {
 	_mode = 0;
 }
 
 Channel::Channel(int mode, const std::string &name, const std::string &key, const std::string &topic, int limit) 
-	: _mode(mode), _limit(limit), _userCount(1), _name(name), _key(key), _topic(topic) {}
+	: _mode(mode), _limit(limit), _userCount(0), _name(name), _key(key), _topic(topic) {}
 
 Channel::~Channel() {}
 
@@ -22,7 +22,9 @@ const std::string &Channel::getKey() const
 
 void	Channel::joinChannel(int fd, UserInfo& user)
 {
-	if (_userCount > _limit)
+	if (_members.find(fd) != _members.end())
+		throw std::runtime_error("You are already in this channel!");
+	if (_userCount >= _limit)
 		throw std::runtime_error("this channel is full!");
 	_members[fd] = &user;
 	_userCount++;
@@ -32,7 +34,7 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 void	Channel::kickMember(int fd)
 {
 	std::map<int, UserInfo*>::iterator it = _members.find(fd);
-	if (it != _members.end())
+	if (it == _members.end())
 		throw std::runtime_error("No exist member in channel!");
 	_members.erase(fd);
 	_userCount--;
