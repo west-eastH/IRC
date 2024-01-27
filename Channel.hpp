@@ -16,7 +16,6 @@ private:
 
 public:
     Channel(std::string name, std::string key);
-    Channel(int mode, const std::string &name, const std::string &key, const std::string &topic, int limit);
     ~Channel();
 
 	const std::string &getName() const;
@@ -24,4 +23,5 @@ public:
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
 	void	announce(const std::string msg);
+	void	setTopic(const std::string topic);
 };

@@ -5,9 +5,6 @@ Channel::Channel(std::string name, std::string key) : _mode(0), _limit(10), _use
 	_mode = 0;
 }
 
-Channel::Channel(int mode, const std::string &name, const std::string &key, const std::string &topic, int limit) 
-	: _mode(mode), _limit(limit), _userCount(0), _name(name), _key(key), _topic(topic) {}
-
 Channel::~Channel() {}
 
 const std::string &Channel::getName() const 
@@ -45,4 +42,14 @@ void	Channel::announce(const std::string msg)
 	std::map<int, UserInfo*>::iterator it;
 	for (it = _members.begin(); it != _members.end(); ++it)
 		send(it->first, msg.c_str(), msg.length(), 0);
+}
+
+void	setTopic(const std::string topic)
+{
+	_topic = topic;
+}
+
+const std::string& getTopic() const
+{
+	return _topic;
 }

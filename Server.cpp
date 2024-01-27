@@ -200,18 +200,18 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Kick(clients, channels, fd, buff);
 	else if (buff.begin()->compare("INVITE") == 0)
 		cmd = new Invite(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("QUIT") == 0)
-	//	cmd = new Quit();
-	//else if (buff.begin()->compare("PART") == 0)
-	//	cmd = new Part();
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
-	//else if (buff.begin()->compare("OPER") == 0)
-	//	cmd = new Oper();
 	//else if (buff.begin()->compare("MODE") == 0)
 	//	cmd = new Mode();
 	//else if (buff.begin()->compare("TOPIC") == 0)
 	//	cmd = new Topic();
+	//else if (buff.begin()->compare("QUIT") == 0)
+	//	cmd = new Quit();
+	//else if (buff.begin()->compare("PART") == 0)
+	//	cmd = new Part();
+	//else if (buff.begin()->compare("OPER") == 0)
+	//	cmd = new Oper();
 	else
 		throw(1);
 	return cmd;
