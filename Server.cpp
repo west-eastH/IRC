@@ -4,6 +4,7 @@
 #include "User.hpp"
 #include "Join.hpp"
 #include "Kick.hpp"
+#include "Invite.hpp"
 
 Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password)
 {
@@ -197,8 +198,8 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Join(clients, channels, fd, buff);
 	else if (buff.begin()->compare("KICK") == 0)
 		cmd = new Kick(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("INVITE") == 0)
-	//	cmd = new Invite();
+	else if (buff.begin()->compare("INVITE") == 0)
+		cmd = new Invite(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("QUIT") == 0)
 	//	cmd = new Quit();
 	//else if (buff.begin()->compare("PART") == 0)

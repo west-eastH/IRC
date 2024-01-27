@@ -20,6 +20,8 @@ void Kick::execute()
 		throw std::runtime_error("You are not channel operator!!");
 	if ((targetFd = findNick(_parsedCommand[2])) == -1 || _clients[targetFd].channels.find(_parsedCommand[1]) == _clients[targetFd].channels.end())
 		throw std::runtime_error("They aren't on that channel!!");
+	if (_curUser.getNickName() == _clients[targetFd].getNickName())
+		throw std::runtime_error("Can not kick yourself!!");
 	_clients[targetFd].channels.erase(_parsedCommand[1]);
 	chIdx = findChannel(_parsedCommand[1]);
 	_channels[chIdx].kickMember(targetFd);
