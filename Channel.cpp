@@ -1,8 +1,8 @@
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, std::string key) : _mode(0), _limit(10), _userCount(0), _name(name), _key(key) {
-	_mode = 0;
+Channel::Channel(std::string name, std::string key) : _tMode(false), _iMode(false), _kMode(false), _limit(10), _userCount(0), _name(name), _key(key) {
+
 }
 
 Channel::~Channel() {}
@@ -52,4 +52,35 @@ void	Channel::setTopic(const std::string topic)
 const std::string& Channel::getTopic() const
 {
 	return _topic;
+}
+
+void	Channel::onTMode()
+{
+	_tMode = true;
+}
+
+void	Channel::onIMode()
+{
+	_iMode = true;
+}
+
+void	Channel::onKMode()
+{
+	_kMode = true;
+}
+
+
+void	Channel::offTMode()
+{
+	_tMode = false;
+}
+
+void	Channel::offIMode()
+{
+	_iMode = false;
+}
+
+void	Channel::offKMode()
+{
+	_kMode = false;
 }

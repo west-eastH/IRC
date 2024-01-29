@@ -6,8 +6,10 @@
 #include "Kick.hpp"
 #include "Invite.hpp"
 #include "Topic.hpp"
+#include "Oper.hpp"
+#include "Mode.hpp"
 
-Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password)
+Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password), _rootId("qwer"), _rootPw("1234")
 {
     if (!isValidPort(port))
         throw std::invalid_argument("Wrong port!");
@@ -67,7 +69,7 @@ void Server::start(void)
 {
     int kq = 0;
     int newEvents = 0;
-	Command* cmd = NULL;
+	std::vector<Command*> cmds;
     struct kevent	eventList[8];
     struct kevent*	currEvent = NULL;
     std::vector<struct kevent> changeList;
@@ -101,25 +103,30 @@ void Server::start(void)
             {
                 if (currEvent->ident == _socketFd)
                     connectClient(changeList);
-                else if (clients.find(currEvent->ident) != clients.end() && !cmd)
-                    cmd = parsingCommand(*currEvent);
+                else if (clients.find(currEvent->ident) != clients.end() && cmds.empty())
+                    cmds = parsingCommand(*currEvent);
             }
-            else if (currEvent->filter == EVFILT_WRITE && cmd != NULL && currEvent->ident == cmd->_fd)
+            else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->_fd)
 			{
 				try
 				{
-                	cmd->execute();
+					for (size_t i = 0; i < cmds.size(); i++)
+					{
+						cmds[i]->execute();
+					}
+					
 				}
 				catch(const std::exception& e)
 				{
 					std::string errMsg = e.what();
-					errMsg += "\n";
-					send(cmd->_fd, errMsg.c_str(), errMsg.length(), 0);
+					errMsg += "\r\n";
+					send(cmds.front()->_fd, errMsg.c_str(), errMsg.length(), 0);
 				}
 				
-				clients[cmd->_fd].sendBuffer.clear();
-				delete cmd;
-				cmd = NULL;
+				clients[cmds[i]->_fd].sendBuffer.clear();
+				for (size_t i = 0; i < cmds.size(); i++)
+					delete cmds[i];
+				cmds.clear();
 			}
         }
         
@@ -138,9 +145,9 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
     clients[client_socket].sendBuffer.clear();
 }
 
-Command* Server::parsingCommand(struct kevent& currEvent)
+std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 {
-	Command* cmd = NULL;
+	std::vector<Command*> cmds;
     char buf[1024];
     int n = recv(currEvent.ident, buf, sizeof(buf), 0);
 	std::vector<std::string> tokenizedBuffer;
@@ -150,22 +157,30 @@ Command* Server::parsingCommand(struct kevent& currEvent)
     if (n == 0)
     {
         disconnectClient(currEvent.ident);
-		return NULL;
+		cmds.clear();
+		return cmds;
     }
 	buf[n] = '\0';
+	std::cout << "buff : " << buf << std::endl;
 	clients[currEvent.ident].sendBuffer += buf;
-	
 	try
 	{
+		//커맨드 단위 벡터 만들기
+		//단일 커맨드를 공백기준으로 잘라서
 		splitBuff(currEvent.ident, tokenizedBuffer);
-		cmd = createCommand(currEvent.ident, tokenizedBuffer);
+		for (size_t i = 0; i < tokenizedBuffer.size(); i++)
+		{
+			std::vector<std::string> token = splitSpace(tokenizedBuffer[i]);
+			cmds.push_back(createCommand(currEvent.ident, token));
+		}
 	}
 	catch(int e)
 	{
 		clients[currEvent.ident].sendBuffer.clear();
-		return NULL;
+		cmds.clear();
+		return cmds;
 	}
-	return cmd;
+	return cmds;
 }
 
 void Server::disconnectClient(int client_fd)
@@ -177,18 +192,49 @@ void Server::disconnectClient(int client_fd)
 
 void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 {
-	size_t		pos = clients[fd].sendBuffer.find("\r\n");
-	if (pos != std::string::npos)
-		clients[fd].sendBuffer.erase(pos);
-	buff = this->split(clients[fd].sendBuffer, ' ');
-	if (buff.size() == 0)
-		throw(1);
+	size_t pos = clients[fd].sendBuffer.find("\r\n");
+	while (pos != std::string::npos)
+	{
+		std::string cmdTemp;
+		cmdTemp = clients[fd].sendBuffer.substr(0, pos);
+		buff.push_back(cmdTemp);
+    	clients[fd].sendBuffer.erase(0, pos + 2);
+		pos = clients[fd].sendBuffer.find("\r\n");
+		// if (buff.size() == 0)
+		// 	throw(1);
+	}
+	if (clients[fd].sendBuffer.size() != 0)
+		buff.push_back(clients[fd].sendBuffer);
+	std::cout << "buff size : " << buff.size() << std::endl;
+}
+
+std::vector<std::string> Server::splitSpace(std::string& st)
+{
+	size_t pos = st.find(" ");
+	std::vector<std::string> vec;
+
+	while (pos != std::string::npos)
+	{
+		std::string cmdTemp;
+		cmdTemp = st.substr(0, pos);
+		if (cmdTemp.length() != 0)
+			vec.push_back(cmdTemp);
+    	st.erase(0, pos + 1);
+		pos = st.find(" ");
+	}
+	if (st.size() != 0)
+		vec.push_back(st);
+	std::cout << "split size : " << vec.size() << std::endl;
+	return vec;
 }
 
 Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 {
 	Command*	cmd	= NULL;
 
+// 여기서 buff에 명령어 리스트들이 들어있어서 반복문 돌면서 해야하는데 어떻게 해야할까
+
+	// 그냥 split(buff.begin())->compare("PASS") 요렇게!!!
 	if (buff.begin()->compare("PASS") == 0)
 		cmd = new Pass(clients, channels, fd, buff, _password);
 	else if (buff.begin()->compare("NICK") == 0)
@@ -203,16 +249,20 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Invite(clients, channels, fd, buff);
 	else if (buff.begin()->compare("TOPIC") == 0)
 		cmd = new Topic(clients, channels, fd, buff);
+	else if (buff.begin()->compare("OPER") == 0)
+		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
+	else if (buff.begin()->compare("MODE") == 0)
+		cmd = new Mode(clients, channels, fd, buff);
+	/* else if (buff.begin()->compare("PING") == 0)
+		cmd = new Ping(); */
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
-	//else if (buff.begin()->compare("MODE") == 0)
-	//	cmd = new Mode();
+	//else if (buff.begin()->compare("LIST") == 0)
+	//	cmd = new List();
 	//else if (buff.begin()->compare("QUIT") == 0)
 	//	cmd = new Quit();
 	//else if (buff.begin()->compare("PART") == 0)
 	//	cmd = new Part();
-	//else if (buff.begin()->compare("OPER") == 0)
-	//	cmd = new Oper();
 	else
 		throw(1);
 	return cmd;

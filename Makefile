@@ -26,7 +26,9 @@ SRCS =	main.cpp \
 		Join.cpp \
 		Kick.cpp \
 		Invite.cpp \
-		Topic.cpp
+		Topic.cpp \
+		Oper.cpp \
+		Mode.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

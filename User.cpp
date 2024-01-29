@@ -12,16 +12,15 @@ User::~User()
 
 void User::execute()
 {
-	if (_curUser.isPass() == 0 || _curUser.isActive() == 1)
+	std::cout <<"im User!!!@!@!@!@!" << std::endl;
+	if (/* _curUser.isPass() == 0 ||  */_curUser.isActive() == 1)
 		throw std::runtime_error("You need to pass first or already actived");
-
 	if (_parsedCommand.size() < 5)
 		throw std::invalid_argument("Wrong User args!");
-	// <user> <mode> <unused> <realname>
+	// USER <user> <mode> <unused> <realname>
 	if (_parsedCommand[4][0] != ':')
 		throw std::runtime_error("Wrong realname args!");
 	_curUser.setUserName(_parsedCommand[1]);
-	_parsedCommand[2] == "0" ? _curUser.deauthorize() : _curUser.authorize();
 
 	std::string realname;
 	for (int i = 4; i < (int)_parsedCommand.size(); i++)
@@ -30,5 +29,5 @@ void User::execute()
 	realname.erase(realname.find_last_not_of(" ") + 1);
 	_curUser.setRealName(realname);
 	_curUser.activate();
-	putString(_fd, _curUser.getNickName() + " logined!!!!!\n");
+	sendToClient(_fd, "001 USER :Welcome to the Internet Relay Network");
 }

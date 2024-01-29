@@ -10,17 +10,21 @@
 #include <sys/event.h>
 #include <string>
 #include <exception>
+#include <vector>
 
 #include <sstream>
 
 #include "UserInfo.hpp"
 #include "Channel.hpp"
 
+
 class Command;
 class Server{
     private:
         std::string			_serverName;
         const std::string	_password;
+		const std::string	_rootId;
+		const std::string	_rootPw;
         int					_port;
         uintptr_t			_socketFd;
 
@@ -32,9 +36,10 @@ class Server{
         void		disconnectClient(int clientFd);
 		void		splitBuff(uintptr_t fd, std::vector<std::string>& buff);
         void		executeCommand(struct kevent* currEvent, Command* cmd);
-        Command*	parsingCommand(struct kevent& currEvent);
+        std::vector<Command*> parsingCommand(struct kevent& currEvent);
 		Command*	createCommand(uintptr_t fd, std::vector<std::string>& buff);
 		std::vector<std::string> split(std::string input, char delimiter);
+		std::vector<std::string> splitSpace(std::string& st);
 
     public:
 

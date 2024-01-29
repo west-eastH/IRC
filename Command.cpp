@@ -30,3 +30,24 @@ int	Command::findChannel(const std::string& name) const
 	}
 	return -1;
 }
+
+void Command::sendToClient(int clientFd, std::string warning)
+{
+    warning += "\r\n";
+    const char *msg = warning.c_str();
+
+    std::cout << warning;
+    int result = send(clientFd, const_cast<char *>(msg), std::strlen(msg), 0);
+    
+    if (result == -1) {
+        throw new std::runtime_error("Error: send failed");
+    }
+}
+/* 
+ if (getParameters().size() < 1) {
+
+        std::string warning = "461 PASS :Not enough parameters";
+        Communicate::sendToClient(user.getFd(), warning);
+
+        return ;
+    } */

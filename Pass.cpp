@@ -8,6 +8,7 @@ Pass::~Pass()
 }
 void Pass::execute()
 {
+	std::cout <<"im pass!!!@!@!@!@!" << std::endl;
 	if (_curUser.isActive() == true)
 		throw std::runtime_error("Already Passed!");
 	if (_parsedCommand.size() != 2)
@@ -15,11 +16,12 @@ void Pass::execute()
 	if (_parsedCommand[1] != _password)
 	{
 		_curUser.denyAccess();
-		putString(_fd, "not good.\n");
+		//putString(_fd, "not good.\n");
 	}
 	else
 	{
 		_curUser.allowAccess();
-		putString(_fd, "very good.\n");
+		sendToClient(_fd, "hello");
+		//putString(_fd, "very good.\n");
 	}
 }

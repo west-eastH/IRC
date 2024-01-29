@@ -1,10 +1,10 @@
 #include "UserInfo.hpp"
 
-UserInfo::UserInfo() : _auth(false),  _pass(false),_active(false), _realName("default name"), _userName("default user")
+UserInfo::UserInfo() : _pass(false), _active(false), _root(false), _realName("default name"), _userName("default user")
 {
 	static int	_nickIdx = 0;
 	std::stringstream ss;
-    ss << "default nick" << _nickIdx;
+    ss << "default" << _nickIdx;
 	_nickIdx++;
     std::string nick = ss.str();
     _nickName = nick;
@@ -28,11 +28,6 @@ const std::string &UserInfo::getUserName(void) const
     return _userName;
 }
 
-bool UserInfo::isAuth(void) const
-{
-    return _auth;
-}
-
 bool UserInfo::isActive(void) const
 {
     return _active;
@@ -41,6 +36,11 @@ bool UserInfo::isActive(void) const
 bool UserInfo::isPass(void) const
 {
     return _pass;
+}
+
+bool UserInfo::isRoot(void) const
+{
+	return _root;
 }
 
 void UserInfo::setNickName(const std::string &nickName)
@@ -80,10 +80,10 @@ void UserInfo::denyAccess(void)
 
 void UserInfo::authorize()
 {
-	_auth = true;
+	_root = true;
 }
 
 void UserInfo::deauthorize()
 {
-	_auth = false;
+	_root = false;
 }

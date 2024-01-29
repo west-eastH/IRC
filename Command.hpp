@@ -18,5 +18,6 @@ class Command
 		void throwError(const int fd, const std::string& str) const;
 		int findNick(const std::string& nick) const;
 		int	findChannel(const std::string& name) const;
+		void sendToClient(int clientFd, std::string warning);
 		virtual void execute() = 0;
 };

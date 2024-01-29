@@ -8,9 +8,9 @@ class UserInfo{
 public:
 
 private:
-    bool		_auth;
 	bool		_pass;
     bool		_active;
+	bool		_root;
     std::string	_nickName;
     std::string	_realName;
     std::string	_userName;
@@ -30,9 +30,9 @@ public:
     void setRealName(const std::string &realName);
     void setUserName(const std::string &userName);
 
-    bool isAuth(void) const;
     bool isActive(void) const;
 	bool isPass(void) const;
+	bool isRoot(void) const;
 
 	void activate(void);
 	void deactivate(void);
