@@ -40,6 +40,7 @@ class Server{
 		Command*	createCommand(uintptr_t fd, std::vector<std::string>& buff);
 		std::vector<std::string> split(std::string input, char delimiter);
 		std::vector<std::string> splitSpace(std::string& st);
+		void		sendError(uintptr_t fd, std::string errCode, std::string errCmd, std::string msg);
 
     public:
 

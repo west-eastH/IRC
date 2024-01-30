@@ -28,7 +28,8 @@ SRCS =	main.cpp \
 		Invite.cpp \
 		Topic.cpp \
 		Oper.cpp \
-		Mode.cpp
+		Mode.cpp \
+		Ping.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

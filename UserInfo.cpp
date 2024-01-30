@@ -1,6 +1,6 @@
 #include "UserInfo.hpp"
 
-UserInfo::UserInfo() : _pass(false), _active(false), _root(false), _realName("default name"), _userName("default user")
+UserInfo::UserInfo() : _pass(false), _active(false), _root(false), _realName("name"), _userName("user")
 {
 	static int	_nickIdx = 0;
 	std::stringstream ss;
@@ -26,6 +26,11 @@ const std::string &UserInfo::getRealName(void) const
 const std::string &UserInfo::getUserName(void) const
 {
     return _userName;
+}
+
+const std::string &UserInfo::getHostName(void) const
+{
+	return _hostName;
 }
 
 bool UserInfo::isActive(void) const
@@ -56,6 +61,11 @@ void UserInfo::setRealName(const std::string &realName)
 void UserInfo::setUserName(const std::string &userName)
 {
     _userName = userName;
+}
+
+void UserInfo::setHostName(const std::string &hostName)
+{
+	_hostName = hostName;
 }
 
 void UserInfo::activate(void)

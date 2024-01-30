@@ -31,12 +31,13 @@ int	Command::findChannel(const std::string& name) const
 	return -1;
 }
 
-void Command::sendToClient(int clientFd, std::string warning)
+void Command::sendToClient(int clientFd, std::string prefix, std::string cmd, std::string params)
 {
-    warning += "\r\n";
-    const char *msg = warning.c_str();
+	std::string success = ":" + prefix + " " + cmd + " " + params + "\r\n";
 
-    std::cout << warning;
+    const char *msg = success.c_str();
+
+    std::cout << success;
     int result = send(clientFd, const_cast<char *>(msg), std::strlen(msg), 0);
     
     if (result == -1) {
@@ -51,3 +52,13 @@ void Command::sendToClient(int clientFd, std::string warning)
 
         return ;
     } */
+
+
+Command::CommandError::CommandError(std::string errCode, std::string errCmd, std::string msg) : _msg(errCode + " " + errCmd + " :" + msg + "\r\n") {}
+
+Command::CommandError::~CommandError() throw() {}
+
+const char* Command::CommandError::what() const throw()
+{
+	return _msg.c_str();
+}

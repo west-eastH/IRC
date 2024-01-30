@@ -1,3 +1,0 @@
-/Users/jonhan/42/test2/cmake-build-debug/CMakeFiles/irc.dir
-/Users/jonhan/42/test2/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/jonhan/42/test2/cmake-build-debug/CMakeFiles/rebuild_cache.dir

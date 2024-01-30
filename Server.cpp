@@ -8,6 +8,7 @@
 #include "Topic.hpp"
 #include "Oper.hpp"
 #include "Mode.hpp"
+#include "Ping.hpp"
 
 Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password), _rootId("qwer"), _rootPw("1234")
 {
@@ -119,10 +120,8 @@ void Server::start(void)
 				catch(const std::exception& e)
 				{
 					std::string errMsg = e.what();
-					errMsg += "\r\n";
 					send(cmds.front()->_fd, errMsg.c_str(), errMsg.length(), 0);
 				}
-				
 				clients[cmds[i]->_fd].sendBuffer.clear();
 				for (size_t i = 0; i < cmds.size(); i++)
 					delete cmds[i];
@@ -161,7 +160,6 @@ std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 		return cmds;
     }
 	buf[n] = '\0';
-	std::cout << "buff : " << buf << std::endl;
 	clients[currEvent.ident].sendBuffer += buf;
 	try
 	{
@@ -205,7 +203,6 @@ void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 	}
 	if (clients[fd].sendBuffer.size() != 0)
 		buff.push_back(clients[fd].sendBuffer);
-	std::cout << "buff size : " << buff.size() << std::endl;
 }
 
 std::vector<std::string> Server::splitSpace(std::string& st)
@@ -224,7 +221,6 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 	}
 	if (st.size() != 0)
 		vec.push_back(st);
-	std::cout << "split size : " << vec.size() << std::endl;
 	return vec;
 }
 
@@ -253,8 +249,8 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
 	else if (buff.begin()->compare("MODE") == 0)
 		cmd = new Mode(clients, channels, fd, buff);
-	/* else if (buff.begin()->compare("PING") == 0)
-		cmd = new Ping(); */
+	else if (buff.begin()->compare("PING") == 0)
+		cmd = new Ping(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
 	//else if (buff.begin()->compare("LIST") == 0)

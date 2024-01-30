@@ -7,7 +7,6 @@ Nick::~Nick() {}
 
 void Nick::execute()
 {
-	std::cout <<"im Nick!!!@!@!@!@!" << std::endl;
 	// std::string warning = "461 PASS :Not enough parameters";
     //     sendToClient(_fd, warning);
 	if (_curUser.isPass() == false)
@@ -16,8 +15,8 @@ void Nick::execute()
 		throw std::runtime_error("Wrong Nick args!");
 	if (findNick(_parsedCommand[1]) != -1)
 		throw std::runtime_error("이미 사용중인 닉네임입니다.");
-	std::string tmp = ":" + _curUser.getNickName() + "!" + _curUser.getUserName() + 
-		"@localhost NICK " + _parsedCommand[1];
-	sendToClient(_fd, tmp);
+	
+	std::string prefix = _curUser.getNickName() + "!" + _curUser.getUserName() + "@" + _curUser.getHostName();
+	sendToClient(_fd, prefix, _parsedCommand[0], _parsedCommand[1]);
 	_curUser.setNickName(_parsedCommand[1]);
 }
