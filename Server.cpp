@@ -19,17 +19,6 @@ Server::Server(char* port, char* password) : _serverName("Reboot"), _password(pa
 
 Server::~Server() {}
 
-std::vector<std::string> Server::split(std::string input, char delimiter)
-{
-    std::vector<std::string> answer;
-    std::stringstream ss(input);
-    std::string temp;
- 
-    while (getline(ss, temp, delimiter))
-        answer.push_back(temp); 
-    return answer;
-}
-
 bool Server::isValidPort(char *port)
 {
     int tempPort;
@@ -111,20 +100,19 @@ void Server::start(void)
 			{
 				try
 				{
+					std::cout << "fd = " << cmds.front()->_fd << std::endl;
 					for (size_t i = 0; i < cmds.size(); i++)
-					{
 						cmds[i]->execute();
-					}
-					
 				}
 				catch(const std::exception& e)
 				{
-					std::string errMsg = e.what();
-					send(cmds.front()->_fd, errMsg.c_str(), errMsg.length(), 0);
+					std::cerr << e.what() <<std::endl;
 				}
-				clients[cmds[i]->_fd].sendBuffer.clear();
 				for (size_t i = 0; i < cmds.size(); i++)
+				{
+					clients[cmds[i]->_fd].sendBuffer.clear();
 					delete cmds[i];
+				}
 				cmds.clear();
 			}
         }
@@ -209,7 +197,7 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 {
 	size_t pos = st.find(" ");
 	std::vector<std::string> vec;
-
+	std::cout << st << std::endl;
 	while (pos != std::string::npos)
 	{
 		std::string cmdTemp;
@@ -237,6 +225,8 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Nick(clients, channels, fd, buff);
 	else if (buff.begin()->compare("USER") == 0)
 		cmd = new User(clients, channels, fd, buff);
+	else if (buff.begin()->compare("PING") == 0)
+		cmd = new Ping(clients, channels, fd, buff);
 	else if (buff.begin()->compare("JOIN") == 0)
 		cmd = new Join(clients, channels, fd, buff);
 	else if (buff.begin()->compare("KICK") == 0)
@@ -249,8 +239,6 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
 	else if (buff.begin()->compare("MODE") == 0)
 		cmd = new Mode(clients, channels, fd, buff);
-	else if (buff.begin()->compare("PING") == 0)
-		cmd = new Ping(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
 	//else if (buff.begin()->compare("LIST") == 0)

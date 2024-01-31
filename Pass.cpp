@@ -8,16 +8,25 @@ Pass::~Pass()
 }
 void Pass::execute()
 {
-	if (_curUser.isActive() == true)
-		throw std::runtime_error("Already Passed!");
-	if (_parsedCommand.size() != 2)
-		throw CommandError("461", _parsedCommand[0], " : Not enough parameters");
+	if (exceptionPass())
+		return ;
 	if (_parsedCommand[1] != _password)
-	{
 		_curUser.denyAccess();
-	}
 	else
-	{
 		_curUser.allowAccess();
+}
+
+bool Pass::exceptionPass()
+{
+	if (_curUser.isActive() == true)
+	{
+		errorToClient("462", _parsedCommand[0], "Unauthorized command (already registered)");
+		return true;
 	}
+	if (_parsedCommand.size() != 2)
+	{
+		errorToClient("461", _parsedCommand[0], "Not enough parameters");
+		return true;
+	}
+	return false;
 }

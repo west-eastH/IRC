@@ -31,29 +31,53 @@ int	Command::findChannel(const std::string& name) const
 	return -1;
 }
 
-void Command::sendToClient(int clientFd, std::string prefix, std::string cmd, std::string params)
+void Command::sendToClient(int clientFd, std::string cmd, std::string params, bool flag)
 {
+	std::string prefix;
+	if (flag == 0) // prefix -> USER
+		prefix = _curUser.getNickName() + "!" + _curUser.getUserName() + "@" + _curUser.getServerName();
+	else // prefix -> SERVER
+		prefix = _curUser.getServerName();
+
 	std::string success = ":" + prefix + " " + cmd + " " + params + "\r\n";
-
     const char *msg = success.c_str();
-
-    std::cout << success;
     int result = send(clientFd, const_cast<char *>(msg), std::strlen(msg), 0);
     
-    if (result == -1) {
+    if (result == -1)
         throw new std::runtime_error("Error: send failed");
-    }
+}
+
+void Command::responseToClient(std::string num, std::string cmd, std::string params)
+{
+	std::string response = num + " " + cmd + " :" + params + "\r\n";
+    const char *msg = response.c_str();
+    int result = send(_fd, const_cast<char *>(msg), std::strlen(msg), 0);
+    
+    if (result == -1)
+        throw new std::runtime_error("Error: send failed");
+}
+
+
+void Command::errorToClient(std::string errCode, std::string errCmd, std::string msg)
+{
+	std::string errMsg = errCode + " " + errCmd + " :" + msg + "\r\n";
+    const char *resultMsg = errMsg.c_str();
+    int result = send(_fd, const_cast<char *>(resultMsg), std::strlen(resultMsg), 0);
+    
+    if (result == -1)
+        throw new std::runtime_error("Error: send failed");
+}
+
+bool Command::isPrintable(const std::string str)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (!std::isprint(str[i]))
+			return false;
+	}
+	return true;
 }
 /* 
- if (getParameters().size() < 1) {
-
-        std::string warning = "461 PASS :Not enough parameters";
-        Communicate::sendToClient(user.getFd(), warning);
-
-        return ;
-    } */
-
-
 Command::CommandError::CommandError(std::string errCode, std::string errCmd, std::string msg) : _msg(errCode + " " + errCmd + " :" + msg + "\r\n") {}
 
 Command::CommandError::~CommandError() throw() {}
@@ -62,3 +86,4 @@ const char* Command::CommandError::what() const throw()
 {
 	return _msg.c_str();
 }
+ */

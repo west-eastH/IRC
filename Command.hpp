@@ -19,16 +19,9 @@ class Command
 		int findNick(const std::string& nick) const;
 		int	findChannel(const std::string& name) const;
 		// void sendToClient(int clientFd, std::string warning);
-		void sendToClient(int clientFd, std::string prefix, std::string cmd, std::string params);
-
+		void sendToClient(int clientFd, std::string cmd, std::string params, bool flag);
+		void responseToClient(std::string num, std::string cmd, std::string params);
+		void errorToClient(std::string errCode, std::string errCmd, std::string msg);
+		bool isPrintable(const std::string str);
 		virtual void execute() = 0;
-		class CommandError : public std::exception
-		{
-			private:
-				const std::string _msg;
-			public:
-				CommandError(std::string errCode, std::string errCmd, std::string msg);
-				~CommandError() throw();
-				const char* what() const throw();
-		};
 };

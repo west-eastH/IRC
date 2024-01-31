@@ -17,6 +17,11 @@ const std::string &Channel::getKey() const
 	return _key;
 }
 
+const char Channel::getMode() const																						
+{
+	return _mode;
+}
+
 void	Channel::joinChannel(int fd, UserInfo& user)
 {
 	if (_members.find(fd) != _members.end())
@@ -37,6 +42,11 @@ void	Channel::kickMember(int fd)
 	_userCount--;
 }
 
+void	Channel::chopMember(const std::string& name, bool op)
+{
+	
+}
+
 void	Channel::announce(const std::string msg)
 {
 	std::map<int, UserInfo*>::iterator it;
@@ -49,38 +59,43 @@ void	Channel::setTopic(const std::string topic)
 	_topic = topic;
 }
 
+void Channel::setMode(const char mode)
+{
+	_mode = mode;
+}
+
 const std::string& Channel::getTopic() const
 {
 	return _topic;
 }
 
-void	Channel::onTMode()
-{
-	_tMode = true;
-}
+// void	Channel::onTMode()
+// {
+// 	_tMode = true;
+// }
 
-void	Channel::onIMode()
-{
-	_iMode = true;
-}
+// void	Channel::onIMode()
+// {
+// 	_iMode = true;
+// }
 
-void	Channel::onKMode()
-{
-	_kMode = true;
-}
+// void	Channel::onKMode()
+// {
+// 	_kMode = true;
+// }
 
 
-void	Channel::offTMode()
-{
-	_tMode = false;
-}
+// void	Channel::offTMode()
+// {
+// 	_tMode = false;
+// }
 
-void	Channel::offIMode()
-{
-	_iMode = false;
-}
+// void	Channel::offIMode()
+// {
+// 	_iMode = false;
+// }
 
-void	Channel::offKMode()
-{
-	_kMode = false;
-}
+// void	Channel::offKMode()
+// {
+// 	_kMode = false;
+// }

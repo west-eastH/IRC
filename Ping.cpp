@@ -7,16 +7,33 @@ Ping::~Ping() {}
 
 void Ping::execute()
 {
-	// int chIdx = -1;
-	struct hostent *host_info;
+	if (exceptionPing())
+		return ;
+	pong();
+}
 
+bool Ping::exceptionPing()
+{
+	struct hostent *host_info;
 	if (_parsedCommand.size() != 2)
-		throw std::runtime_error("409 PING :No origin specified");
+	{
+		errorToClient("409", _parsedCommand[0], "No origin specified");
+		return true;
+	}
 	host_info = gethostbyname(_parsedCommand[1].c_str());
-	if (std::strcmp(_curUser.getHostName().c_str(), host_info->h_name))
-		throw std::runtime_error("402 PING :localhost :No such serverd");
-	std::string result = "PONG " + _curUser.getHostName();
-	send(_fd, result.c_str(), result.length(), 0);
-	// _curUser.channels[_parsedCommand[1]] = oper;
-	// _channels[chIdx].joinChannel(_fd, _curUser);
+	if (std::strcmp(_curUser.getServerName().c_str(), host_info->h_name))
+	{
+		errorToClient("402",  _parsedCommand[0], "localhost :No such serverd");
+		return true;
+	}
+	return false;
+}
+
+void Ping::pong()
+{
+	std::string result = "PONG " + _curUser.getServerName();
+	 int n = send(_fd, result.c_str(), result.length(), 0);
+	 std::cout << result << std::endl;
+    if (n == -1)
+        throw new std::runtime_error("Error: send failed");
 }

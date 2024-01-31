@@ -15,6 +15,7 @@ private:
     std::string	_realName;
     std::string	_userName;
 	std::string _hostName;
+	std::string _serverName;
 
 public:
     UserInfo();
@@ -27,11 +28,13 @@ public:
     const std::string &getRealName(void) const;
     const std::string &getUserName(void) const;
 	const std::string &getHostName(void) const;
+	const std::string &getServerName(void) const;
 
     void setNickName(const std::string &nickName);
     void setRealName(const std::string &realName);
     void setUserName(const std::string &userName);
 	void setHostName(const std::string &hostName);
+	void setServerName(const std::string &hostName);
 
     bool isActive(void) const;
 	bool isPass(void) const;

@@ -33,6 +33,11 @@ const std::string &UserInfo::getHostName(void) const
 	return _hostName;
 }
 
+const std::string &UserInfo::getServerName(void) const
+{
+	return _serverName;
+}
+
 bool UserInfo::isActive(void) const
 {
     return _active;
@@ -66,6 +71,11 @@ void UserInfo::setUserName(const std::string &userName)
 void UserInfo::setHostName(const std::string &hostName)
 {
 	_hostName = hostName;
+}
+
+void UserInfo::setServerName(const std::string &serverName)
+{
+	_serverName = serverName;
 }
 
 void UserInfo::activate(void)
