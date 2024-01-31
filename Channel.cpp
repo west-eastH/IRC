@@ -1,7 +1,7 @@
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, std::string key) : _tMode(false), _iMode(false), _kMode(false), _limit(10), _userCount(0), _name(name), _key(key) {
+Channel::Channel(std::string name, std::string key) : _limit(10), _userCount(0), _name(name), _key(key) {
 
 }
 
@@ -17,7 +17,7 @@ const std::string &Channel::getKey() const
 	return _key;
 }
 
-const char Channel::getMode() const																						
+const std::string& Channel::getMode() const																						
 {
 	return _mode;
 }
@@ -42,11 +42,6 @@ void	Channel::kickMember(int fd)
 	_userCount--;
 }
 
-void	Channel::chopMember(const std::string& name, bool op)
-{
-	
-}
-
 void	Channel::announce(const std::string msg)
 {
 	std::map<int, UserInfo*>::iterator it;
@@ -59,7 +54,7 @@ void	Channel::setTopic(const std::string topic)
 	_topic = topic;
 }
 
-void Channel::setMode(const char mode)
+void Channel::setMode(const std::string mode)
 {
 	_mode = mode;
 }

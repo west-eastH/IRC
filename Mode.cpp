@@ -106,9 +106,9 @@ bool Mode::checkMode(const std::string& mode)
 
 void Mode::chmod(Channel& channel, const std::string& mode)
 {
+	//============================================TODO===============================================
 	int opCode = '+';
-	char currMode = channel.getMode();
-
+	static void (Mode::*chmodFunc[5])(Channel& channel, const int opCode) = {&Mode::changeModeI, &Mode::changeModeT, &Mode::changeModeK, &Mode::changeModeL, &Mode::changeModeO};
 	// itklo
 	const std::string modeList = "itklo";
 	for (size_t i = 0; i < mode.length(); i++)
@@ -116,15 +116,66 @@ void Mode::chmod(Channel& channel, const std::string& mode)
 		if (mode[i] == '+' || mode[i] == '-')
 			opCode = mode[i];
 		else
+			(this->*chmodFunc[modeList.find(mode[i])])(channel, opCode);
+	}
+}
+
+void Mode::changeModeI(Channel& channel, const int opCode)
+{
+	if (opCode == '+')
+	{
+		if (channel.getMode().find('i') != std::string::npos)
 		{
-			if (mode[i] == 'o')
-				channel.
-			size_t pos = (modeList.find(mode[i]) + 1);
-			if (opCode == '+')
-				currMode |= (1 << pos);
-			else
-				currMode &= ~(1 << pos);
+			//error exception
+			return ;
 		}
 	}
-	channel.setMode(currMode);
+}
+
+void Mode::changeModeT(Channel& channel, const int opCode)
+{
+	if (opCode == '+')
+	{
+		if (channel.getMode().find('i') != std::string::npos)
+		{
+			//error exception
+			return ;
+		}
+	}
+}
+
+void Mode::changeModeK(Channel& channel, const int opCode)
+{
+	if (opCode == '+')
+	{
+		if (channel.getMode().find('i') != std::string::npos)
+		{
+			//error exception
+			return ;
+		}
+	}
+}
+
+void Mode::changeModeL(Channel& channel, const int opCode)
+{
+	if (opCode == '+')
+	{
+		if (channel.getMode().find('i') != std::string::npos)
+		{
+			//error exception
+			return ;
+		}
+	}
+}
+
+void Mode::changeModeO(Channel& channel, const int opCode)
+{
+	if (opCode == '+')
+	{
+		if (channel.getMode().find('i') != std::string::npos)
+		{
+			//error exception
+			return ;
+		}
+	}
 }
