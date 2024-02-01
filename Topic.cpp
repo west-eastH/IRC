@@ -7,26 +7,68 @@ Topic::Topic(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, u
 Topic::~Topic()
 {
 }
+
+bool Topic::exceptionTopic()
+{
+	if (_curUser.isActive() == false)
+	{
+		errorToClient("", _parsedCommand[0], "You need to login first");
+		return true;
+	}
+	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
+	{
+		errorToClient("461", _parsedCommand[0], "Not enough parameters");
+		return true;
+	}
+	if (_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
+	{
+		errorToClient("442", _parsedCommand[1], "You're not on that channel");
+		return true;
+	}
+	return false;
+}
+bool Topic::printTopic()
+{
+	if (_parsedCommand.size() == 2)
+	{
+		if (_channels[chIdx].getTopic().length() == 0)
+			responseToClient("331", _parsedCommand[1], "No topic is set");
+		else
+			responseToClient("332", _parsedCommand[1], _parsedCommand[2]);
+		return true;
+	}
+	return false;
+}
+
+bool Topic::checkAuth()
+{
+	if (_channels[chIdx].checkMode("t") && _curUser.channels[_parsedCommand[1]] == false)
+	{
+		errorToClient("482", _parsedCommand[1], "You're not channel operator");
+		return true;
+	}
+	return false;
+}
+
 void Topic::execute()
 {
+		//	 ok 442  -  ERR_NOTONCHANNEL  -  <channel> :You're not on that channel
+        //   331  -  RPL_NOTOPIC  -  <channel> :No topic is set
+		//   332  -  RPL_TOPIC  -  <channel> :<topic>
+        //   ok 482  -  ERR_CHANOPRIVSNEEDED  -  <channel> :You're not channel operator
 	int chIdx = -1;
 	std::string msg;
 
-	if (_curUser.isActive() == false)
-		throw std::runtime_error("You need to login first");
-	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
-		throw std::runtime_error("Wrong topic args!");
-	if (_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
-		throw std::runtime_error("No exist User!!");
-	chIdx = findChannel(_parsedCommand[1]);
-	if (_parsedCommand.size() == 2)
-	{
-		msg = _parsedCommand[1] + "'s topic is [" + _channels[chIdx].getTopic() + "]\n";
-		send(_fd, msg.c_str(), msg.length(), 0);
+	if (exceptionTopic())
 		return ;
-	}
-	if (_curUser.channels[_parsedCommand[1]] == false)
-		throw std::runtime_error("You are not channel operator!!");
+	
+	chIdx = findChannel(_parsedCommand[1]);
+	if (printTopic())
+		return ;
+
+	if (checkAuth())
+		return ;
+
 	_channels[chIdx].setTopic(_parsedCommand[2]);
 	_channels[chIdx].announce("The channel's topic has been changed to '" + _parsedCommand[2] + "'.\n");
 }
