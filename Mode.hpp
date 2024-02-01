@@ -9,15 +9,15 @@ private:
 	bool checkMode(const std::string& mode);
 	void chmod(Channel& channel, const std::string& mode);
 
-void changeModeI(Channel& channel, const int opCode);
+bool changeModeI(Channel& channel, const int opCode);
 
-void changeModeT(Channel& channel, const int opCode);
+bool changeModeT(Channel& channel, const int opCode);
 
-void changeModeK(Channel& channel, const int opCode);
+bool changeModeK(Channel& channel, const int opCode);
 
-void changeModeL(Channel& channel, const int opCode);
+bool changeModeL(Channel& channel, const int opCode);
 
-void changeModeO(Channel& channel, const int opCode);
+bool changeModeO(Channel& channel, const int opCode);
 
 public:
 	Mode(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);

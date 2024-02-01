@@ -28,6 +28,17 @@ Join::Join(std::map<int, UserInfo> &clients, std::vector<Channel> &channels, uin
 
 Join::~Join() {}
 
+// 		471    ERR_CHANNELISFULL
+//               "<channel> :Cannot join channel (+l)"
+//      473    ERR_INVITEONLYCHAN
+//               "<channel> :Cannot join channel (+i)"
+// 		475    ERR_BADCHANNELKEY
+// 			"<channel> :Cannot join channel (+k)"
+// 		332    RPL_TOPIC
+//               "<channel> :<topic>"
+
+
+
 void Join::execute()
 {
 	int chIdx = -1;

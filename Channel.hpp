@@ -25,7 +25,7 @@ public:
 	const std::string& getMode() const;
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
-	void	chopMember(const std::string& name, bool op);
+	int		chopMember(const std::string& nick, bool op);
 	void	announce(const std::string msg);
 
 	void	setMode(const std::string mode);
