@@ -20,7 +20,7 @@ bool Mode::exceptionMode()
 		errorToClient("", _parsedCommand[0], "Activate first!");
 		return true;
 	}
-	if (_parsedCommand.size() < 3 || _parsedCommand.size() > 4)
+	if (_parsedCommand.size() < 3)
 	{
 		errorToClient("461", _parsedCommand[0], "Not enough parameters");
 		return true;
@@ -38,11 +38,11 @@ bool Mode::exceptionMode()
 
 void Mode::execute()
 {
-/* 
- */
 	if (exceptionMode())
 		return ;
 	if (checkMode(_parsedCommand[2]) == false)
+		return ;
+	if (checkParams(_parsedCommand[2]) == false)
 		return ;
 	// if (checkMode(_channels[findChannel(_parsedCommand[1])], _parsedCommand[2]) == false)
 	// 	throw std::runtime_error("Invaild mode flag!!");
@@ -52,6 +52,7 @@ void Mode::execute()
 bool Mode::checkMode(const std::string& mode)
 {
 	const std::string modeList = "itklo+-";
+
 	for (size_t i = 0; i < mode.length(); i++)
 	{
 		if (modeList.find(mode[i]) == std::string::npos)
@@ -64,32 +65,62 @@ bool Mode::checkMode(const std::string& mode)
 	return true;
 }
 
-void Mode::chmod(Channel& channel, const std::string& mode)
+bool Mode::checkParams(const std::string& mode)
 {
-	//============================================TODO===============================================
-	int opCode = '+';
-	static bool (Mode::*chmodFunc[5])(Channel& channel, const int opCode) = {&Mode::changeModeI, &Mode::changeModeT, &Mode::changeModeK, &Mode::changeModeL, &Mode::changeModeO};
-	const std::string modeList = "itklo";
+	int opCode;
+	int requiredParamsCount = 0;
+	int commandParamsSize = _parsedCommand.size() - 3;
+
 	for (size_t i = 0; i < mode.length(); i++)
 	{
 		if (mode[i] == '+' || mode[i] == '-')
 			opCode = mode[i];
 		else
 		{
-			if ((this->*chmodFunc[modeList.find(mode[i])])(channel, opCode))
+			if ((opCode == '+' && (mode[i] == 'k' || mode[i] == 'l' || mode[i] == 'o')) || \
+				(opCode == '-' && (mode[i] == 'k' || mode[i] == 'o')))
+				requiredParamsCount++;
+		}
+	}
+	if (commandParamsSize != requiredParamsCount)
+		return false;
+	return true;
+}
+
+void Mode::chmod(Channel& channel, const std::string& mode)
+{
+	//============================================TODO===============================================
+	int opCode = '+';
+	static bool (Mode::*chmodFunc[5])(Channel& channel, const int opCode, const std::string& param) = {&Mode::changeModeI, &Mode::changeModeT, &Mode::changeModeK, &Mode::changeModeL, &Mode::changeModeO};
+	const std::string modeList = "itklo";
+	int paramIdx = 0;
+	bool successChangeMode;
+	for (size_t i = 0; i < mode.length(); i++)
+	{
+		if (mode[i] == '+' || mode[i] == '-')
+			opCode = mode[i];
+		else
+		{
+			if ((opCode == '+' && (mode[i] == 'k' || mode[i] == 'l' || mode[i] == 'o')) || \
+				(opCode == '-' && (mode[i] == 'k' || mode[i] == 'o')))
+				successChangeMode = (this->*chmodFunc[modeList.find(mode[i])])(channel, opCode, _parsedCommand[3 + paramIdx++]);
+			else
+				successChangeMode = (this->*chmodFunc[modeList.find(mode[i])])(channel, opCode, "");
+			if (successChangeMode)
 			{
 				if (mode[i] == 'o')
-					responseToClient("325", _parsedCommand[1], _parsedCommand[3]);
+					responseToClient("325", _parsedCommand[1], _parsedCommand[2 + paramIdx]);
 				else
-					responseToClient("324", _parsedCommand[1] + " " + channel.getMode(), _parsedCommand[2]);
+					responseToClient("324", _parsedCommand[1] + " " + _parsedCommand[2], "");
 			}
 		}
 	}
 }
 
-bool Mode::changeModeI(Channel& channel, const int opCode)
+bool Mode::changeModeI(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('i');
+	(void) param;
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
@@ -109,9 +140,10 @@ bool Mode::changeModeI(Channel& channel, const int opCode)
 	return true;
 }
 
-bool Mode::changeModeT(Channel& channel, const int opCode)
+bool Mode::changeModeT(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('t');
+	(void) param;
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
@@ -131,7 +163,7 @@ bool Mode::changeModeT(Channel& channel, const int opCode)
 	return true;
 }
 
-bool Mode::changeModeK(Channel& channel, const int opCode)
+bool Mode::changeModeK(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('k');
 	if (opCode == '+')
@@ -144,25 +176,34 @@ bool Mode::changeModeK(Channel& channel, const int opCode)
 		std::string currMode = channel.getMode();
 		currMode += "k";
 		channel.setMode(currMode);
+		channel.setKey(param);
 	}
 	else
 	{
-		if (pos == std::string::npos)
+		if (pos == std::string::npos || channel.getKey() != param)
 			return false;
 		std::string currMode = channel.getMode();
 		currMode.erase(pos, 1);
 		channel.setMode(currMode);
+		channel.setKey("");
 	}
 	return true;
 }
 
-bool Mode::changeModeL(Channel& channel, const int opCode)
+bool Mode::changeModeL(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('l');
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
 			return false;
+		for (size_t i = 0; i < param.length(); i++)
+			if (std::isdigit(param[i]) == 0)
+				return false;
+		int limit = std::atoi(param.c_str());
+		if (channel.getUserCount() > limit || limit < 1)
+			return false;
+		channel.setLimit(limit);
 		std::string currMode = channel.getMode();
 		currMode += "l";
 		channel.setMode(currMode);
@@ -178,13 +219,13 @@ bool Mode::changeModeL(Channel& channel, const int opCode)
 	return true;
 }
 
-bool Mode::changeModeO(Channel& channel, const int opCode)
+bool Mode::changeModeO(Channel& channel, const int opCode, const std::string& param)
 {
 	bool modeO = opCode == '+' ? true : false;
-	int res = channel.chopMember(_parsedCommand[3], modeO);
+	int res = channel.chopMember(param, modeO);
 	if (res < 0)
 	{
-		errorToClient("441", _parsedCommand[3] + " " + _parsedCommand[1], "They aren't on that channel");
+		errorToClient("441", param + " " + _parsedCommand[1], "They aren't on that channel");
 		return false;
 	}
 	if (res == 0)

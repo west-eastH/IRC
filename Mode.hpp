@@ -7,6 +7,8 @@ class Mode : public Command
 private:
 	bool exceptionMode();
 	bool checkMode(const std::string& mode);
+	bool checkParams(const std::string& mode);
+
 	void chmod(Channel& channel, const std::string& mode);
 
 	bool changeModeI(Channel& channel, const int opCode);
