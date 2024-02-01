@@ -49,7 +49,6 @@ void Join::execute()
 {
 	int chIdx = -1;
 	bool oper = false;
-
 	if (exceptionJoin())
 		return ;
 	if (_parsedCommand.size() == 2)
@@ -62,7 +61,6 @@ void Join::execute()
 	chIdx = findChannel(_parsedCommand[1]);
 	if (checkChMode(chIdx))
 		return ;
-
 	_curUser.channels[_parsedCommand[1]] = oper;
 	_channels[chIdx].joinChannel(_fd, _curUser);
 }

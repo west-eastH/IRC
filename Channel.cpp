@@ -1,7 +1,9 @@
 
 #include "Channel.hpp"
+#include "Command.hpp"
 
 Channel::Channel(std::string name, std::string key) : _mode("t"), _limit(10), _userCount(0), _name(name), _key(key), _topic("") {
+	std::cout << "너냐??" << std::endl;
 }
 
 Channel::~Channel() {}
@@ -35,10 +37,21 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 {
 	if (_members.find(fd) != _members.end())
 		throw std::runtime_error("You are already in this channel!");
+	
 	//if (_userCount >= _limit)
 	//	throw std::runtime_error("this channel is full!");
 	_members[fd] = &user;
 	_userCount++;
+
+	std::map<int, UserInfo*>::iterator it;
+	std::string users;
+/* 	for (it = _members.begin(); it != _members.end(); ++it)
+	{
+		if (it != _members.begin())
+			users += "*";
+		users += it->second->getNickName();
+	} */
+	//TODO :: getMembers()
 	announce(user.getNickName() + " join " + _name + "Channel!\n");
 }
 
@@ -61,11 +74,6 @@ void	Channel::announce(const std::string msg)
 void	Channel::setTopic(const std::string topic)
 {
 	_topic = topic;
-}
-
-void Channel::setLimit(const int limit)
-{
-	_limit = limit;
 }
 
 bool Channel::checkMode(const std::string &mode)
@@ -96,11 +104,6 @@ void Channel::setKey(const std::string key)
 const std::string& Channel::getTopic() const
 {
 	return _topic;
-}
-
-int Channel::getUserCount() const
-{
-	return _userCount;
 }
 
 int	Channel::chopMember(const std::string& nick, bool op) 

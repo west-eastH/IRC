@@ -102,16 +102,20 @@ void Server::start(void)
 				{
 					std::cout << "fd = " << cmds.front()->_fd << std::endl;
 					for (size_t i = 0; i < cmds.size(); i++)
-						cmds[i]->execute();
+					{
+						if (cmds[i])
+							cmds[i]->execute();
+					}
 				}
 				catch(const std::exception& e)
 				{
 					std::cerr << e.what() <<std::endl;
 				}
+				clients[cmds[0]->_fd].sendBuffer.clear();
 				for (size_t i = 0; i < cmds.size(); i++)
 				{
-					clients[cmds[i]->_fd].sendBuffer.clear();
-					delete cmds[i];
+					if (cmds[i])
+						delete cmds[i];
 				}
 				cmds.clear();
 			}
@@ -157,7 +161,8 @@ std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 		for (size_t i = 0; i < tokenizedBuffer.size(); i++)
 		{
 			std::vector<std::string> token = splitSpace(tokenizedBuffer[i]);
-			cmds.push_back(createCommand(currEvent.ident, token));
+			if (token.size() != 0)
+				cmds.push_back(createCommand(currEvent.ident, token));
 		}
 	}
 	catch(int e)
@@ -190,7 +195,10 @@ void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 		// 	throw(1);
 	}
 	if (clients[fd].sendBuffer.size() != 0)
+	{
+		std::cout << "파싱 꼬레" <<  clients[fd].sendBuffer << std::endl;
 		buff.push_back(clients[fd].sendBuffer);
+	}
 }
 
 std::vector<std::string> Server::splitSpace(std::string& st)
@@ -209,6 +217,10 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 	}
 	if (st.size() != 0)
 		vec.push_back(st);
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		std::cout << vec[i] << std::endl;
+	}
 	return vec;
 }
 

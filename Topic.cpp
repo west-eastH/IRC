@@ -27,7 +27,7 @@ bool Topic::exceptionTopic()
 	}
 	return false;
 }
-bool Topic::printTopic()
+bool Topic::printTopic(int chIdx)
 {
 	if (_parsedCommand.size() == 2)
 	{
@@ -40,7 +40,7 @@ bool Topic::printTopic()
 	return false;
 }
 
-bool Topic::checkAuth()
+bool Topic::checkAuth(int chIdx)
 {
 	if (_channels[chIdx].checkMode("t") && _curUser.channels[_parsedCommand[1]] == false)
 	{
@@ -63,10 +63,10 @@ void Topic::execute()
 		return ;
 	
 	chIdx = findChannel(_parsedCommand[1]);
-	if (printTopic())
+	if (printTopic(chIdx))
 		return ;
 
-	if (checkAuth())
+	if (checkAuth(chIdx))
 		return ;
 
 	_channels[chIdx].setTopic(_parsedCommand[2]);

@@ -10,7 +10,6 @@ void Kick::execute()
 	int chIdx = -1;
 	int targetFd;
 	std::string msg;
-
 	if (_curUser.isActive() == false)
 		throw std::runtime_error("You need to login first");
 	if (_parsedCommand.size() < 3 || _parsedCommand.size() > 4)
