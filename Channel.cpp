@@ -59,9 +59,27 @@ void Channel::setMode(const std::string mode)
 	_mode = mode;
 }
 
+void Channel::setLimit(const int limit)
+{
+	_limit = limit;
+}
+
+void Channel::setKey(const std::string key)
+{
+	if (key == "")
+		_key.clear();
+	else
+		_key = key;
+}
+
 const std::string& Channel::getTopic() const
 {
 	return _topic;
+}
+
+int Channel::getUserCount() const
+{
+	return _userCount;
 }
 
 int	Channel::chopMember(const std::string& nick, bool op) 
