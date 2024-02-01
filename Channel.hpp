@@ -6,7 +6,7 @@
 
 class Channel {
 private:
-	char		_mode;
+	std::string	_mode;
 
     int		 	_limit;
     int			_userCount;
@@ -22,12 +22,12 @@ public:
 	const std::string& getName() const;
 	const std::string& getKey() const;
 	const std::string& getTopic() const;
-	const char getMode() const;
+	const std::string& getMode() const;
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
-	void	chopMember(const std::string& name, bool op);
+	int		chopMember(const std::string& nick, bool op);
 	void	announce(const std::string msg);
 
-	void	setMode(const char mode);
+	void	setMode(const std::string mode);
 	void	setTopic(const std::string topic);
 };
