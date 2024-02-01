@@ -12,9 +12,6 @@ bool Join::exceptionJoin()
 		errorToClient("461", _parsedCommand[0], "Not enough parameters");
 		return true;
 	}
-	/* TODO : INVITE MODE */
-	//ERR_INVITEONLYCHAN
-	
 	if (_parsedCommand[1][0] != '#')
 	{
 		errorToClient("", _parsedCommand[0], "channel name have to start with '#'");
@@ -28,16 +25,25 @@ Join::Join(std::map<int, UserInfo> &clients, std::vector<Channel> &channels, uin
 
 Join::~Join() {}
 
-// 		471    ERR_CHANNELISFULL
-//               "<channel> :Cannot join channel (+l)"
-//      473    ERR_INVITEONLYCHAN
-//               "<channel> :Cannot join channel (+i)"
-// 		475    ERR_BADCHANNELKEY
-// 			"<channel> :Cannot join channel (+k)"
-// 		332    RPL_TOPIC
-//               "<channel> :<topic>"
-
-
+bool Join::checkChMode(int chIdx)
+{
+	if (_channels[chIdx].checkMode("k") && _channels[chIdx].getKey() != _parsedCommand[2])
+	{
+		errorToClient("475", _parsedCommand[1], "Cannot join channel (+k)");
+		return (true);
+	}
+	else if (_channels[chIdx].checkMode("l") && _channels[chIdx].getLimit() == _channels[chIdx].getUserCount())
+	{
+		errorToClient("471", _parsedCommand[1], "Cannot join channel (+l)");
+		return (true);
+	}
+	else if (_channels[chIdx].checkMode("i"))
+	{
+		errorToClient("473", _parsedCommand[1], "Cannot join channel (+i)");
+		return (true);
+	}
+	return (false);
+}
 
 void Join::execute()
 {
@@ -54,9 +60,9 @@ void Join::execute()
 		oper = true;
 	}
 	chIdx = findChannel(_parsedCommand[1]);
-	if (_channels[chIdx].getKey() != _parsedCommand[2])
-		errorToClient("475", _parsedCommand[0], "Cannot join channel (+k)");
-		throw std::runtime_error("Wrong password!");
+	if (checkChMode(chIdx))
+		return ;
+
 	_curUser.channels[_parsedCommand[1]] = oper;
 	_channels[chIdx].joinChannel(_fd, _curUser);
 }

@@ -23,8 +23,9 @@ public:
 	const std::string& getKey() const;
 	const std::string& getTopic() const;
 	const std::string& getMode() const;
-	int getUserCount() const;
+
 	int getLimit() const;
+	int getUserCount() const;
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
 	int		chopMember(const std::string& nick, bool op);
@@ -32,6 +33,7 @@ public:
 
 	void	setMode(const std::string mode);
 	void	setTopic(const std::string topic);
-	void	setKey(const std::string key);
 	void	setLimit(const int limit);
+	bool	checkMode(const std::string& mode);
+	void	setKey(const std::string key);
 };
