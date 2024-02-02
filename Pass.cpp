@@ -32,8 +32,3 @@ bool Pass::exceptionPass()
 	}
 	return false;
 }
-
-//NICK phan
-//USER phan phan 0 :pilho
-//WHOIS phan
-//PING irc.libera.chat

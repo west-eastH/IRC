@@ -50,7 +50,8 @@ void User::execute()
 	realname.erase(realname.find_last_not_of(" ") + 1);
 	_curUser.setRealName(realname);
 	_curUser.activate();
-	sendToClient(_fd, "001", "Welcome to the Internet Relay Network", SERVER);
+	std::string postfix = _curUser.getNickName() + "!~" + _curUser.getUserName() + "@" + _curUser.getServerName();
+	sendToClient(_fd, "001", "Welcome to the Internet Relay Network " + postfix, SERVER);
 	sendToClient(_fd, "002", "Your host is " + _curUser.getServerName() + ", running version 0.0.1", SERVER);
 	sendToClient(_fd, "003", "This server was created 24/02/02", SERVER);
 	sendToClient(_fd, "004", _curUser.getServerName() + " 0.0.1 ", SERVER);
