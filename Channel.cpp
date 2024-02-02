@@ -2,9 +2,7 @@
 #include "Channel.hpp"
 #include "Command.hpp"
 
-Channel::Channel(std::string name, std::string key) : _mode("t"), _limit(10), _userCount(0), _name(name), _key(key), _topic("") {
-	std::cout << "너냐??" << std::endl;
-}
+Channel::Channel(std::string name, std::string key) : _mode("t"), _limit(10), _userCount(0), _name(name), _key(key), _topic("") {}
 
 Channel::~Channel() {}
 
@@ -40,7 +38,9 @@ const std::string Channel::getMembers()
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
 		if (it != _members.begin())
-			users += "*";
+			users += " ";
+		if (it->second->channels[_name] == true)
+			users += "@";
 		users += it->second->getNickName();
 	}
 	return users;
@@ -56,9 +56,10 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 	//	throw std::runtime_error("this channel is full!");
 	_members[fd] = &user;
 	_userCount++;
-
 	
-	announce(user.getNickName() + " join " + _name + " Channel!\n");
+/*
+	
+	announce(user.getNickName() + " join " + _name + " Channel!\r\n");*/
 }
 
 void	Channel::kickMember(int fd)
@@ -69,14 +70,19 @@ void	Channel::kickMember(int fd)
 	_members.erase(fd);
 	_userCount--;
 }
-
+/*
 void	Channel::announce(const std::string msg)
 {
+	std::string prefix;
+	std::string success;
+
+	prefix = _curUser.getServerName();
+	success = ":" + prefix + " " + _name + " " + params + "\r\n";
 	std::map<int, UserInfo*>::iterator it;
 	for (it = _members.begin(); it != _members.end(); ++it)
 		send(it->first, msg.c_str(), msg.length(), 0);
 }
-
+*/
 void	Channel::setTopic(const std::string topic)
 {
 	_topic = topic;

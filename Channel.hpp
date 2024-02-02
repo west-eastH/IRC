@@ -13,9 +13,9 @@ private:
     std::string	_name;
     std::string	_key;
     std::string	_topic;
-	std::map<int, UserInfo*>	_members;
 
 public:
+	std::map<int, UserInfo*>	_members;
     Channel(std::string name, std::string key);
     ~Channel();
 
@@ -30,8 +30,7 @@ public:
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
 	int		chopMember(const std::string& nick, bool op);
-	void	announce(const std::string msg);
-
+	//void	announce(const std::string msg);
 	void	setMode(const std::string mode);
 	void	setTopic(const std::string topic);
 	void	setLimit(const int limit);

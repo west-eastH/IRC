@@ -34,6 +34,7 @@ void Nick::execute()
 {
 	if (exceptionNick())
 		return ;
-	sendToClient(_fd, _parsedCommand[0], " :" + _parsedCommand[1], CLIENT);
+	sendToClient(_fd, _parsedCommand[0], " " + _parsedCommand[1], CLIENT);
 	_curUser.setNickName(_parsedCommand[1]);
 }
+///connect -nocap localhost 6667 1234

@@ -13,11 +13,13 @@ void Invite::execute()
 
 	if (exceptionInvite())
 		return ;
+	targetFd = findNick(_parsedCommand[2]);
 	_clients[targetFd].channels[_parsedCommand[1]] = false;
 	chIdx = findChannel(_parsedCommand[1]);
 	_channels[chIdx].joinChannel(targetFd, _clients[targetFd]);
 
 	sendToClient(_fd, "341", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
+	
 	//301 추가해야할지도 모름
 	msg = "You are invited from " + _parsedCommand[1] + "\n";
 	send(targetFd, msg.c_str(), msg.length(), 0);
@@ -25,6 +27,8 @@ void Invite::execute()
 
 bool Invite::exceptionInvite()
 {
+	int targetFd;
+
 	if (_curUser.isActive() == false)
 	{
 		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
@@ -41,7 +45,7 @@ bool Invite::exceptionInvite()
 		sendToClient(_fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
 		return true;
 	}
-	if ((targetFd = findNick(_parsedCommand[2])) == -1 || !_clients[targetFd].isActive())
+	if ((targetFd = findNick(_parsedCommand[2]))== -1 || !_clients[targetFd].isActive())
 	{
 		sendToClient(_fd, "401", _parsedCommand[2] + " :No such nick/channel", SERVER);
 		return true;

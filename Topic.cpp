@@ -70,5 +70,5 @@ void Topic::execute()
 		return ;
 
 	_channels[chIdx].setTopic(_parsedCommand[2]);
-	_channels[chIdx].announce("The channel's topic has been changed to '" + _parsedCommand[2] + "'.\n");
+	//_channels[chIdx].announce("The channel's topic has been changed to '" + _parsedCommand[2] + "'.\n");
 }

@@ -17,12 +17,12 @@ bool Mode::exceptionMode()
 {
 	if (_curUser.isActive() != true)
 	{
-		errorToClient("", _parsedCommand[0], "Activate first!");
+		sendToClient(_fd, "", _parsedCommand[0] + " :Activate first!", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 3)
 	{
-		errorToClient("461", _parsedCommand[0], "Not enough parameters");
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1].front() != '#')
@@ -30,7 +30,7 @@ bool Mode::exceptionMode()
 	if ((_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end()
 		|| _curUser.channels[_parsedCommand[1]] == false))
 	{
-		errorToClient("482", _parsedCommand[0], "You are not channel operator!!");
+		sendToClient(_fd, "482", _parsedCommand[0] + " :You are not channel operator!!", SERVER);
 		return true;
 	}
 	return false;		
@@ -57,8 +57,8 @@ bool Mode::checkMode(const std::string& mode)
 	{
 		if (modeList.find(mode[i]) == std::string::npos)
 		{
-			std::string errMsg = mode + "is unknown mode char to me for " + _parsedCommand[1];
-			errorToClient("472", mode, errMsg);
+			std::string errMsg = mode + " :is unknown mode char to me for " + _parsedCommand[1];
+			sendToClient(_fd, "472", errMsg, SERVER);
 			return false;
 		}
 	}
@@ -109,9 +109,9 @@ void Mode::chmod(Channel& channel, const std::string& mode)
 			if (successChangeMode)
 			{
 				if (mode[i] == 'o')
-					responseToClient("325", _parsedCommand[1], _parsedCommand[2 + paramIdx]);
+					sendToClient(_fd, "325", _parsedCommand[1] + _parsedCommand[2 + paramIdx], SERVER);
 				else
-					responseToClient("324", _parsedCommand[1] + " " + _parsedCommand[2], "");
+					sendToClient(_fd, "324", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
 			}
 		}
 	}
@@ -170,7 +170,7 @@ bool Mode::changeModeK(Channel& channel, const int opCode, const std::string& pa
 	{
 		if (pos != std::string::npos)
 		{
-			errorToClient("467", _parsedCommand[1], "Channel key already set");
+			sendToClient(_fd, "467", _parsedCommand[1] + " :Channel key already set", SERVER);
 			return false;
 		}
 		std::string currMode = channel.getMode();
@@ -225,7 +225,7 @@ bool Mode::changeModeO(Channel& channel, const int opCode, const std::string& pa
 	int res = channel.chopMember(param, modeO);
 	if (res < 0)
 	{
-		errorToClient("441", param + " " + _parsedCommand[1], "They aren't on that channel");
+		sendToClient(_fd, "441", param + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
 		return false;
 	}
 	if (res == 0)

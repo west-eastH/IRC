@@ -8,7 +8,7 @@ Kick::~Kick() {}
 void Kick::execute()
 {
 	int chIdx = -1;
-	int targetFd;
+	int targetFd = findNick(_parsedCommand[2]);
 	std::string msg;
 
 	if (exceptionKick())
@@ -17,7 +17,8 @@ void Kick::execute()
 	chIdx = findChannel(_parsedCommand[1]);
 	_channels[chIdx].kickMember(targetFd);
 	std::string members = _channels[chIdx].getMembers();
-	sendToClient("353", _parsedCommand[1], members);
+	sendToClient(_fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
+	sendToClient(_fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);
 
 	msg = "You got kicked out from " + _parsedCommand[1];
 	if (_parsedCommand.size() == 4)
@@ -28,6 +29,7 @@ void Kick::execute()
 
 bool Kick::exceptionKick()
 {
+	int channelFd = findChannel(_parsedCommand[1]);
 	if (_curUser.isActive() == false)
 	{
 		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
@@ -48,12 +50,13 @@ bool Kick::exceptionKick()
 		sendToClient(_fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
 		return true;
 	}	
-	if (targetFd = findNick(_parsedCommand[2]) == -1 || _clients[targetFd].channels.find(_parsedCommand[1]) == _clients[targetFd].channels.end())
+	int targetFd = findNick(_parsedCommand[2]);
+	if (targetFd == -1 || _clients[targetFd].channels.find(_parsedCommand[1]) == _clients[targetFd].channels.end())
 	{
 		sendToClient(_fd, "441", _parsedCommand[2] + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
 		return true;
 	}
-	if (int channelFd = findChannel(_parsedCommand[1]) == -1)
+	if (channelFd == -1)
 	{
 		sendToClient(_fd, "403", _parsedCommand[1] + " :No such Channel", SERVER);
 		return true;

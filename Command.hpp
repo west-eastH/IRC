@@ -24,4 +24,5 @@ class Command
 		void sendToClient(int clientFd, std::string cmd, std::string params, bool flag);
 		bool isPrintable(const std::string str);
 		virtual void execute() = 0;
+		//void updateMembers(Channel &channel);
 };
