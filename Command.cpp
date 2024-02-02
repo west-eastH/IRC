@@ -1,3 +1,4 @@
+#include <cstring>
 #include "Command.hpp"
 
 Command::Command(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand) 
@@ -37,7 +38,7 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
 	std::string success;
 	if (flag == CLIENT) // prefix -> USER
 	{
-		prefix = _curUser.getNickName() + "!" + _curUser.getUserName() + "@" + _curUser.getServerName();
+		prefix = _curUser.getNickName() + "!~" + _curUser.getUserName() + "@" + _curUser.getServerName();
 		success = ":" + prefix + " " + cmd + params + "\r\n";
 	}
 	else
@@ -46,9 +47,16 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
 		success = ":" + prefix + " " + cmd + " " + _curUser.getNickName() + " " + params + "\r\n";
 	}
     const char *msg = success.c_str();
-	std::cout << msg << std::endl;
-    int result = send(clientFd, const_cast<char *>(msg), std::strlen(msg), 0);
+	char *msgAlloc = strdup(msg);
+	
+	std::cout << "[DEBUG]msg : " << msgAlloc << std::endl;
     
+	int result = send(clientFd, msgAlloc, std::strlen(msg), 0);
+		std::cout << "result : " << result << std::endl;
+
+	delete msgAlloc;
+    
+
     if (result == -1)
         throw new std::runtime_error("Error: send failed");
 }
