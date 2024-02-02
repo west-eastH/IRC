@@ -23,7 +23,7 @@ bool Nick::exceptionNick()
 		return true;
 	}
 	return false;
-}
+}g
 
 Nick::Nick(std::map<int, UserInfo> &clients, std::vector<Channel> &channels, uintptr_t fd, std::vector<std::string> parsedCommand)
 	: Command(clients, channels, fd, parsedCommand) {}
