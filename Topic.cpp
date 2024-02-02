@@ -12,17 +12,17 @@ bool Topic::exceptionTopic()
 {
 	if (_curUser.isActive() == false)
 	{
-		errorToClient("", _parsedCommand[0], "You need to login first");
+		sendToClient(_fd, "", "You need to login first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
 	{
-		errorToClient("461", _parsedCommand[0], "Not enough parameters");
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
 	{
-		errorToClient("442", _parsedCommand[1], "You're not on that channel");
+		sendToClient(_fd, "442", _parsedCommand[1] + " :You're not on that channel" , SERVER);
 		return true;
 	}
 	return false;
@@ -32,9 +32,9 @@ bool Topic::printTopic(int chIdx)
 	if (_parsedCommand.size() == 2)
 	{
 		if (_channels[chIdx].getTopic().length() == 0)
-			responseToClient("331", _parsedCommand[1], "No topic is set");
+			sendToClient(_fd, "331", _parsedCommand[1] + " :No topic is set", SERVER);
 		else
-			responseToClient("332", _parsedCommand[1], _parsedCommand[2]);
+			sendToClient(_fd, "332", _parsedCommand[1] + " :" +  _channels[chIdx].getTopic(), SERVER);
 		return true;
 	}
 	return false;
@@ -44,7 +44,7 @@ bool Topic::checkAuth(int chIdx)
 {
 	if (_channels[chIdx].checkMode("t") && _curUser.channels[_parsedCommand[1]] == false)
 	{
-		errorToClient("482", _parsedCommand[1], "You're not channel operator");
+		sendToClient(_fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
 		return true;
 	}
 	return false;

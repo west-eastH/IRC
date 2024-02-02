@@ -8,4 +8,5 @@ class Invite : public Command
 		Invite(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Invite();
 		void execute();
+		bool exceptionInvite();
 };

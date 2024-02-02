@@ -25,11 +25,11 @@ SRCS =	main.cpp \
 		User.cpp \
 		Ping.cpp \
 		WhoIs.cpp \
-		#Join.cpp \
+		Join.cpp \
 		Kick.cpp \
 		Invite.cpp \
 		Topic.cpp \
-		Oper.cpp \
+		#Oper.cpp \
 		Mode.cpp \
 
 OBJS = $(SRCS:.cpp=.o)

@@ -242,14 +242,14 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Ping(clients, channels, fd, buff);
 	else if (buff.begin()->compare("WHOIS") == 0)
 		cmd = new WhoIs(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("JOIN") == 0)
-	//	cmd = new Join(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("KICK") == 0)
-	//	cmd = new Kick(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("INVITE") == 0)
-	//	cmd = new Invite(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("TOPIC") == 0)
-	//	cmd = new Topic(clients, channels, fd, buff);
+	else if (buff.begin()->compare("JOIN") == 0)
+		cmd = new Join(clients, channels, fd, buff);
+	else if (buff.begin()->compare("KICK") == 0)
+		cmd = new Kick(clients, channels, fd, buff);
+	else if (buff.begin()->compare("INVITE") == 0)
+		cmd = new Invite(clients, channels, fd, buff);
+	else if (buff.begin()->compare("TOPIC") == 0)
+		cmd = new Topic(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("OPER") == 0)
 	//	cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
 	//else if (buff.begin()->compare("MODE") == 0)
