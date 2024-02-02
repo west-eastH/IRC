@@ -34,12 +34,17 @@ int	Command::findChannel(const std::string& name) const
 void Command::sendToClient(int clientFd, std::string cmd, std::string params, bool flag)
 {
 	std::string prefix;
-	if (flag == 0) // prefix -> USER
+	std::string success;
+	if (flag == CLIENT) // prefix -> USER
+	{
 		prefix = _curUser.getNickName() + "!" + _curUser.getUserName() + "@" + _curUser.getServerName();
-	else // prefix -> SERVER
+		success = ":" + prefix + " " + cmd + params + "\r\n";
+	}
+	else
+	{
 		prefix = _curUser.getServerName();
-
-	std::string success = ":" + prefix + " " + cmd + params + "\r\n";
+		success = ":" + prefix + " " + cmd + " " + _curUser.getNickName() + " " + params + "\r\n";
+	}
     const char *msg = success.c_str();
 	std::cout << msg << std::endl;
     int result = send(clientFd, const_cast<char *>(msg), std::strlen(msg), 0);

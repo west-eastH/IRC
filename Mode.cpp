@@ -22,7 +22,6 @@ bool Mode::exceptionMode()
 	}
 	if (_parsedCommand.size() < 3)
 	{
-		std::cout << "=======asdf======== : "  << _parsedCommand.size() << std::endl;
 		errorToClient("461", _parsedCommand[0], "Not enough parameters");
 		return true;
 	}

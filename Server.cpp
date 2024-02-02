@@ -234,26 +234,26 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 	// 그냥 split(buff.begin())->compare("PASS") 요렇게!!!
 	if (buff.begin()->compare("PASS") == 0)
 		cmd = new Pass(clients, channels, fd, buff, _password);
-	/* else if (buff.begin()->compare("NICK") == 0)
+	else if (buff.begin()->compare("NICK") == 0)
 		cmd = new Nick(clients, channels, fd, buff);
 	else if (buff.begin()->compare("USER") == 0)
 		cmd = new User(clients, channels, fd, buff);
 	else if (buff.begin()->compare("PING") == 0)
 		cmd = new Ping(clients, channels, fd, buff);
-	else if (buff.begin()->compare("JOIN") == 0)
-		cmd = new Join(clients, channels, fd, buff);
-	else if (buff.begin()->compare("KICK") == 0)
-		cmd = new Kick(clients, channels, fd, buff);
-	else if (buff.begin()->compare("INVITE") == 0)
-		cmd = new Invite(clients, channels, fd, buff);
-	else if (buff.begin()->compare("TOPIC") == 0)
-		cmd = new Topic(clients, channels, fd, buff);
-	else if (buff.begin()->compare("OPER") == 0)
-		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
-	else if (buff.begin()->compare("MODE") == 0)
-		cmd = new Mode(clients, channels, fd, buff);
 	else if (buff.begin()->compare("WHOIS") == 0)
-		cmd = new WhoIs(clients, channels, fd, buff); */
+		cmd = new WhoIs(clients, channels, fd, buff);
+	//else if (buff.begin()->compare("JOIN") == 0)
+	//	cmd = new Join(clients, channels, fd, buff);
+	//else if (buff.begin()->compare("KICK") == 0)
+	//	cmd = new Kick(clients, channels, fd, buff);
+	//else if (buff.begin()->compare("INVITE") == 0)
+	//	cmd = new Invite(clients, channels, fd, buff);
+	//else if (buff.begin()->compare("TOPIC") == 0)
+	//	cmd = new Topic(clients, channels, fd, buff);
+	//else if (buff.begin()->compare("OPER") == 0)
+	//	cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
+	//else if (buff.begin()->compare("MODE") == 0)
+	//	cmd = new Mode(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
 	//else if (buff.begin()->compare("LIST") == 0)

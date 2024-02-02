@@ -22,13 +22,18 @@ bool Pass::exceptionPass()
 {
 	if (_curUser.isActive() == true)
 	{
-		sendToClient(_fd, "462", " :Unauthorized command (already registered)", 1);
+		sendToClient(_fd, "462", " :Unauthorized command (already registered)", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() != 2)
 	{
-		sendToClient(_fd, "461", " :Not enough parameters", 1);
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	return false;
 }
+
+//NICK phan
+//USER phan phan 0 :pilho
+//WHOIS phan
+//PING irc.libera.chat

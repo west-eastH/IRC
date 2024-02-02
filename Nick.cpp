@@ -9,17 +9,17 @@ bool Nick::exceptionNick()
 	}
 	if (_parsedCommand.size() != 2)
 	{
-		sendToClient(_fd, "431 ", _parsedCommand[0] + " :No nickname given", SERVER);
+		sendToClient(_fd, "431", " :No nickname given", SERVER);
 		return true;
 	}
 	if (!isPrintable(_parsedCommand[1]) || _parsedCommand[1].length() > 9)
 	{
-		sendToClient(_fd, "432", _parsedCommand[1] + "Erroneous nickname", SERVER);
+		sendToClient(_fd, "432", _parsedCommand[1] + " :Erroneous nickname", SERVER);
 		return true;
 	}
 	if (findNick(_parsedCommand[1]) != -1)
 	{
-		sendToClient(_fd, "433", _parsedCommand[1], "Nickname is already in use");
+		sendToClient(_fd, "433", _parsedCommand[1] + " :Nickname is already in use", SERVER);
 		return true;
 	}
 	return false;
@@ -34,6 +34,6 @@ void Nick::execute()
 {
 	if (exceptionNick())
 		return ;
-	sendToClient(_fd, _parsedCommand[0], _parsedCommand[1], 0);
+	sendToClient(_fd, _parsedCommand[0], " " + _parsedCommand[1], CLIENT);
 	_curUser.setNickName(_parsedCommand[1]);
 }

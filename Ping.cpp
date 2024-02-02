@@ -17,13 +17,13 @@ bool Ping::exceptionPing()
 	struct hostent *host_info;
 	if (_parsedCommand.size() != 2)
 	{
-		errorToClient("409", _parsedCommand[0], "No origin specified");
+		sendToClient(_fd, "409", _parsedCommand[0] + " :No origin specified", SERVER);
 		return true;
 	}
 	host_info = gethostbyname(_parsedCommand[1].c_str());
 	if (std::strcmp(_curUser.getServerName().c_str(), host_info->h_name))
 	{
-		errorToClient("402",  _parsedCommand[0], "localhost :No such serverd");
+		sendToClient(_fd, "402",  _parsedCommand[0] + " :localhost :No such serverd", SERVER);
 		return true;
 	}
 	return false;

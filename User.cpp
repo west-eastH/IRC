@@ -4,22 +4,22 @@ bool User::exceptionUser()
 {
 	if (_curUser.isPass() == false)
 	{
-		errorToClient("", _parsedCommand[0], "You need to pass first");
+		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_curUser.isActive() == 1)
 	{
-		errorToClient("462", _parsedCommand[0], "Unauthorized command (already registered)");
+		sendToClient(_fd, "462", _parsedCommand[0] + " :Unauthorized command (already registered)", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 5)
 	{
-		errorToClient("461", _parsedCommand[0], "Not enough parameters");
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[4][0] != ':')
 	{
-		errorToClient("", _parsedCommand[0], "Wrong realname arg!");
+		sendToClient(_fd, "", _parsedCommand[0] + " :Wrong realname arg!", SERVER);
 		return true;
 	}
 	return false;
@@ -50,8 +50,8 @@ void User::execute()
 	realname.erase(realname.find_last_not_of(" ") + 1);
 	_curUser.setRealName(realname);
 	_curUser.activate();
-	responseToClient("001", _parsedCommand[0], "Welcome to the Internet Relay Network");
-	responseToClient("002", _parsedCommand[0], "Your host is " + _curUser.getServerName() + ", running version 0.0.1");
-	responseToClient("003", _parsedCommand[0], "This server was created 24/02/02");
-	responseToClient("004", _parsedCommand[0], _curUser.getServerName() + " 0.0.1 ");
+	sendToClient(_fd, "001", "Welcome to the Internet Relay Network", SERVER);
+	sendToClient(_fd, "002", "Your host is " + _curUser.getServerName() + ", running version 0.0.1", SERVER);
+	sendToClient(_fd, "003", "This server was created 24/02/02", SERVER);
+	sendToClient(_fd, "004", _curUser.getServerName() + " 0.0.1 ", SERVER);
 }
