@@ -9,8 +9,9 @@
 #include "Oper.hpp"
 #include "Mode.hpp"
 #include "Ping.hpp"
+#include "WhoIs.hpp"
 
-Server::Server(char* port, char* password) : _serverName("Reboot"), _password(password), _rootId("qwer"), _rootPw("1234")
+Server::Server(char* port, char* password) : _serverName("localhost"), _password(password), _rootId("qwer"), _rootPw("1234")
 {
     if (!isValidPort(port))
         throw std::invalid_argument("Wrong port!");
@@ -100,7 +101,7 @@ void Server::start(void)
 			{
 				try
 				{
-					std::cout << "fd = " << cmds.front()->_fd << std::endl;
+					// std::cout << "fd = " << cmds.front()->_fd << std::endl;
 					for (size_t i = 0; i < cmds.size(); i++)
 					{
 						if (cmds[i])
@@ -196,7 +197,7 @@ void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 	}
 	if (clients[fd].sendBuffer.size() != 0)
 	{
-		std::cout << "파싱 꼬레" <<  clients[fd].sendBuffer << std::endl;
+		// std::cout << "파싱 꼬레" <<  clients[fd].sendBuffer << std::endl;
 		buff.push_back(clients[fd].sendBuffer);
 	}
 }
@@ -217,10 +218,10 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 	}
 	if (st.size() != 0)
 		vec.push_back(st);
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		std::cout << vec[i] << std::endl;
-	}
+	// for (size_t i = 0; i < vec.size(); i++)
+	// {
+	// 	std::cout << vec[i] << std::endl;
+	// }
 	return vec;
 }
 
@@ -233,7 +234,7 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 	// 그냥 split(buff.begin())->compare("PASS") 요렇게!!!
 	if (buff.begin()->compare("PASS") == 0)
 		cmd = new Pass(clients, channels, fd, buff, _password);
-	else if (buff.begin()->compare("NICK") == 0)
+	/* else if (buff.begin()->compare("NICK") == 0)
 		cmd = new Nick(clients, channels, fd, buff);
 	else if (buff.begin()->compare("USER") == 0)
 		cmd = new User(clients, channels, fd, buff);
@@ -251,6 +252,8 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
 	else if (buff.begin()->compare("MODE") == 0)
 		cmd = new Mode(clients, channels, fd, buff);
+	else if (buff.begin()->compare("WHOIS") == 0)
+		cmd = new WhoIs(clients, channels, fd, buff); */
 	//else if (buff.begin()->compare("PRIVMSG") == 0)
 	//	cmd = new Privmsg();
 	//else if (buff.begin()->compare("LIST") == 0)

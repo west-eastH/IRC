@@ -26,6 +26,7 @@ public:
 
 	int getLimit() const;
 	int getUserCount() const;
+	const std::string getMembers();
 	void	joinChannel(int fd, UserInfo& user);
 	void	kickMember(int fd);
 	int		chopMember(const std::string& nick, bool op);

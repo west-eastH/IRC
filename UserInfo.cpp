@@ -1,6 +1,6 @@
 #include "UserInfo.hpp"
 
-UserInfo::UserInfo() : _pass(false), _active(false), _root(false), _realName("name"), _userName("user")
+UserInfo::UserInfo() : _pass(false), _active(false), _root(false), _realName("name"), _userName("user"), _serverName("localhost")
 {
 	static int	_nickIdx = 0;
 	std::stringstream ss;

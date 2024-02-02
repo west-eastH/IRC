@@ -22,12 +22,12 @@ bool Pass::exceptionPass()
 {
 	if (_curUser.isActive() == true)
 	{
-		errorToClient("462", _parsedCommand[0], "Unauthorized command (already registered)");
+		sendToClient(_fd, "462", " :Unauthorized command (already registered)", 1);
 		return true;
 	}
 	if (_parsedCommand.size() != 2)
 	{
-		errorToClient("461", _parsedCommand[0], "Not enough parameters");
+		sendToClient(_fd, "461", " :Not enough parameters", 1);
 		return true;
 	}
 	return false;

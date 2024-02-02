@@ -33,6 +33,20 @@ int Channel::getUserCount() const
 	return _userCount;
 }
 
+const std::string Channel::getMembers() 
+{
+	std::map<int, UserInfo *>::iterator it;
+	std::string users;
+	for (it = _members.begin(); it != _members.end(); ++it)
+	{
+		if (it != _members.begin())
+			users += "*";
+		users += it->second->getNickName();
+	}
+	return users;
+	// TODO :: getMembers()
+}
+
 void	Channel::joinChannel(int fd, UserInfo& user)
 {
 	if (_members.find(fd) != _members.end())
@@ -43,16 +57,8 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 	_members[fd] = &user;
 	_userCount++;
 
-	std::map<int, UserInfo*>::iterator it;
-	std::string users;
-/* 	for (it = _members.begin(); it != _members.end(); ++it)
-	{
-		if (it != _members.begin())
-			users += "*";
-		users += it->second->getNickName();
-	} */
-	//TODO :: getMembers()
-	announce(user.getNickName() + " join " + _name + "Channel!\n");
+	
+	announce(user.getNickName() + " join " + _name + " Channel!\n");
 }
 
 void	Channel::kickMember(int fd)

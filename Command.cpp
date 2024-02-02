@@ -30,7 +30,7 @@ int	Command::findChannel(const std::string& name) const
 	}
 	return -1;
 }
-
+//[ ":" prefix SPACE ] command [ params ] crlf
 void Command::sendToClient(int clientFd, std::string cmd, std::string params, bool flag)
 {
 	std::string prefix;
@@ -39,30 +39,10 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
 	else // prefix -> SERVER
 		prefix = _curUser.getServerName();
 
-	std::string success = ":" + prefix + " " + cmd + " " + params + "\r\n";
+	std::string success = ":" + prefix + " " + cmd + params + "\r\n";
     const char *msg = success.c_str();
+	std::cout << msg << std::endl;
     int result = send(clientFd, const_cast<char *>(msg), std::strlen(msg), 0);
-    
-    if (result == -1)
-        throw new std::runtime_error("Error: send failed");
-}
-
-void Command::responseToClient(std::string num, std::string cmd, std::string params)
-{
-	std::string response = num + " " + cmd + " :" + params + "\r\n";
-    const char *msg = response.c_str();
-    int result = send(_fd, const_cast<char *>(msg), std::strlen(msg), 0);
-    
-    if (result == -1)
-        throw new std::runtime_error("Error: send failed");
-}
-
-
-void Command::errorToClient(std::string errCode, std::string errCmd, std::string msg)
-{
-	std::string errMsg = errCode + " " + errCmd + " :" + msg + "\r\n";
-    const char *resultMsg = errMsg.c_str();
-    int result = send(_fd, const_cast<char *>(resultMsg), std::strlen(resultMsg), 0);
     
     if (result == -1)
         throw new std::runtime_error("Error: send failed");

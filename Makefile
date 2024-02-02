@@ -20,16 +20,17 @@ SRCS =	main.cpp \
 		UserInfo.cpp \
 		Pass.cpp \
 		Command.cpp \
-		Nick.cpp \
-		User.cpp \
 		Channel.cpp \
+		#Nick.cpp \
+		User.cpp \
 		Join.cpp \
 		Kick.cpp \
 		Invite.cpp \
 		Topic.cpp \
 		Oper.cpp \
 		Mode.cpp \
-		Ping.cpp
+		Ping.cpp \
+		WhoIs.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

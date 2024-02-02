@@ -1,6 +1,9 @@
 #pragma once
 #include "Server.hpp"
 
+#define CLIENT 0
+#define SERVER 1
+
 class Command
 {
 	protected:
@@ -18,10 +21,7 @@ class Command
 		void throwError(const int fd, const std::string& str) const;
 		int findNick(const std::string& nick) const;
 		int	findChannel(const std::string& name) const;
-		// void sendToClient(int clientFd, std::string warning);
 		void sendToClient(int clientFd, std::string cmd, std::string params, bool flag);
-		void responseToClient(std::string num, std::string cmd, std::string params);
-		void errorToClient(std::string errCode, std::string errCmd, std::string msg);
 		bool isPrintable(const std::string str);
 		virtual void execute() = 0;
 };

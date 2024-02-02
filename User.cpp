@@ -51,4 +51,7 @@ void User::execute()
 	_curUser.setRealName(realname);
 	_curUser.activate();
 	responseToClient("001", _parsedCommand[0], "Welcome to the Internet Relay Network");
+	responseToClient("002", _parsedCommand[0], "Your host is " + _curUser.getServerName() + ", running version 0.0.1");
+	responseToClient("003", _parsedCommand[0], "This server was created 24/02/02");
+	responseToClient("004", _parsedCommand[0], _curUser.getServerName() + " 0.0.1 ");
 }

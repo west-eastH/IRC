@@ -63,4 +63,6 @@ void Join::execute()
 		return ;
 	_curUser.channels[_parsedCommand[1]] = oper;
 	_channels[chIdx].joinChannel(_fd, _curUser);
+	std::string members = _channels[chIdx].getMembers();
+	responseToClient("353", _parsedCommand[1], members);
 }

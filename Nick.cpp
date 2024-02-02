@@ -4,22 +4,22 @@ bool Nick::exceptionNick()
 {
 	if (_curUser.isPass() == false)
 	{
-		errorToClient("", _parsedCommand[0], "You need to pass first");
+		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() != 2)
 	{
-		errorToClient("431", _parsedCommand[0], "No nickname given");
+		sendToClient(_fd, "431 ", _parsedCommand[0] + " :No nickname given", SERVER);
 		return true;
 	}
 	if (!isPrintable(_parsedCommand[1]) || _parsedCommand[1].length() > 9)
 	{
-		errorToClient("432", _parsedCommand[1], "Erroneous nickname");
+		sendToClient(_fd, "432", _parsedCommand[1] + "Erroneous nickname", SERVER);
 		return true;
 	}
 	if (findNick(_parsedCommand[1]) != -1)
 	{
-		errorToClient("433", _parsedCommand[1], "Nickname is already in use");
+		sendToClient(_fd, "433", _parsedCommand[1], "Nickname is already in use");
 		return true;
 	}
 	return false;
