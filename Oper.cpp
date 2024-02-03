@@ -7,14 +7,34 @@ Oper::~Oper() {}
 
 void Oper::execute()
 {
-	if (_curUser.isActive() != true)
-		throw std::runtime_error("Activate first!");
-	if (_parsedCommand.size() != 3)
-		throw std::runtime_error(_parsedCommand[0] + " : Not enough parameters");
-	if (_parsedCommand[1] != _rootId || _parsedCommand[2] != _rootPw)
-		throw std::runtime_error("incorrect root information!!!");
-	if (_curUser.isRoot())
-		throw std::runtime_error("You are already root!!!");
+	if (exceptionOper())
+		return ;
 	_curUser.authorize();
+	sendToClient(_fd, "381", " :You are now an IRC operator", SERVER);
 	//putString(_fd, "You are now root!!!\n");
+}
+
+bool Oper::exceptionOper()
+{
+	if (_curUser.isActive() == false)
+	{
+		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		return true;
+	}
+	if (_parsedCommand.size() != 3)
+	{
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+		return true;
+	}
+	if (_parsedCommand[1] != _rootId || _parsedCommand[2] != _rootPw)
+	{
+		sendToClient(_fd, "464", " :Password incorrect", SERVER);
+		return true;
+	}
+	if (_curUser.isRoot())
+	{
+		sendToClient(_fd, "", " You are already root!", SERVER);
+		return true;
+	}
+	return false;
 }

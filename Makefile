@@ -30,8 +30,8 @@ SRCS =	main.cpp \
 		Invite.cpp \
 		Topic.cpp \
 		Privmsg.cpp \
-		#Oper.cpp \
 		Mode.cpp \
+		Oper.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

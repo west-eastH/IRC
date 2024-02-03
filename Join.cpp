@@ -27,6 +27,7 @@ Join::~Join() {}
 
 bool Join::checkChMode(int chIdx)
 {
+	std::cout << "join ckmode : " << _channels[chIdx].getMode() << std::endl; 
 	if (_channels[chIdx].checkMode("k") && _channels[chIdx].getKey() != _parsedCommand[2])
 	{
 		sendToClient(_fd, "475", _parsedCommand[1] + " :Cannot join channel (+k)", SERVER);
@@ -39,6 +40,9 @@ bool Join::checkChMode(int chIdx)
 	}
 	else if (_channels[chIdx].checkMode("i"))
 	{
+		for (size_t i = 0; i < _channels[chIdx].inviteMembers.size(); i++)
+			if (_channels[chIdx].inviteMembers[i] == _curUser.getNickName())
+				return false;
 		sendToClient(_fd, "473", _parsedCommand[1] + " :Cannot join channel (+i)", SERVER);
 		return (true);
 	}
@@ -59,8 +63,10 @@ void Join::execute()
 		oper = true;
 	}
 	chIdx = findChannel(_parsedCommand[1]);
-	if (checkChMode(chIdx))
+	if (!_curUser.isRoot() && checkChMode(chIdx))
 		return ;
+	if (_curUser.isRoot())
+		oper = true;
 	_curUser.channels[_parsedCommand[1]] = oper;
 	_channels[chIdx].joinChannel(_fd, _curUser);
 	std::string members = _channels[chIdx].getMembers();

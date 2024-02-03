@@ -20,7 +20,8 @@ void Invite::execute()
 	targetFd = findNick(_parsedCommand[1]);
 	_clients[targetFd].channels[_parsedCommand[2]] = false;
 	chIdx = findChannel(_parsedCommand[2]);
-	_channels[chIdx].joinChannel(targetFd, _clients[targetFd]);
+	_channels[chIdx].inviteMembers.push_back(_parsedCommand[1]);
+	// _channels[chIdx].joinChannel(targetFd, _clients[targetFd]);
 
 	sendToClient(_fd, "341", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
 	

@@ -11,4 +11,5 @@ class Oper : public Command
 		Oper(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand, std::string id, std::string pw);
 		~Oper();
 		void execute();
+		bool exceptionOper();
 };

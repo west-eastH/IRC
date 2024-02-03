@@ -253,10 +253,10 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Topic(clients, channels, fd, buff);
 	else if (buff.begin()->compare("PRIVMSG") == 0)
 		cmd = new Privmsg(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("OPER") == 0)
-	//	cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
-	//else if (buff.begin()->compare("MODE") == 0)
-	//	cmd = new Mode(clients, channels, fd, buff);
+	else if (buff.begin()->compare("OPER") == 0)
+		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
+	else if (buff.begin()->compare("MODE") == 0)
+		cmd = new Mode(clients, channels, fd, buff);
 	//else if (buff.begin()->compare("LIST") == 0)
 	//	cmd = new List();
 	//else if (buff.begin()->compare("QUIT") == 0)

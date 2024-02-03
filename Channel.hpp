@@ -3,6 +3,7 @@
 
 #include "UserInfo.hpp"
 #include <sys/socket.h>
+#include <vector>
 
 class Channel {
 private:
@@ -16,6 +17,7 @@ private:
 
 public:
 	std::map<int, UserInfo*>	_members;
+	std::vector<std::string>	inviteMembers; 
     Channel(std::string name, std::string key);
     ~Channel();
 
