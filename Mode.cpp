@@ -47,6 +47,7 @@ void Mode::execute()
 	// if (checkMode(_channels[findChannel(_parsedCommand[1])], _parsedCommand[2]) == false)
 	// 	throw std::runtime_error("Invaild mode flag!!");
 	chmod(_channels[findChannel(_parsedCommand[1])], _parsedCommand[2]);
+	std::cout << "mode : " << _channels[findChannel(_parsedCommand[1])].getMode() << std::endl;
 }
 
 bool Mode::checkMode(const std::string& mode)
@@ -62,6 +63,7 @@ bool Mode::checkMode(const std::string& mode)
 			return false;
 		}
 	}
+	std::cout << "chk mode" << std::endl;
 	return true;
 }
 
@@ -84,6 +86,7 @@ bool Mode::checkParams(const std::string& mode)
 	}
 	if (commandParamsSize != requiredParamsCount)
 		return false;
+	std::cout << "ck param" << std::endl;
 	return true;
 }
 

@@ -29,8 +29,8 @@ SRCS =	main.cpp \
 		Kick.cpp \
 		Invite.cpp \
 		Topic.cpp \
-		#Oper.cpp \
 		Mode.cpp \
+		Oper.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
