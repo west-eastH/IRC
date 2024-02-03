@@ -29,6 +29,7 @@ SRCS =	main.cpp \
 		Kick.cpp \
 		Invite.cpp \
 		Topic.cpp \
+		Privmsg.cpp \
 		#Oper.cpp \
 		Mode.cpp \
 

@@ -17,14 +17,10 @@ void Kick::execute()
 	chIdx = findChannel(_parsedCommand[1]);
 	_channels[chIdx].kickMember(targetFd);
 	std::string members = _channels[chIdx].getMembers();
+	sendToClient(_fd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " :" + (_parsedCommand.size() == 3 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
+	sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " :" + (_parsedCommand.size() == 3 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
 	sendToClient(_fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
 	sendToClient(_fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);
-
-	msg = "You got kicked out from " + _parsedCommand[1];
-	if (_parsedCommand.size() == 4)
-		msg += " (" + _parsedCommand[3] + ")";
-	msg += "\r\n";
-	send(targetFd, msg.c_str(), msg.length(), 0);
 }
 
 bool Kick::exceptionKick()
