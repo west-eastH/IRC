@@ -23,7 +23,7 @@ bool Nick::exceptionNick()
 		return true;
 	}
 	return false;
-}g
+}
 
 Nick::Nick(std::map<int, UserInfo> &clients, std::vector<Channel> &channels, uintptr_t fd, std::vector<std::string> parsedCommand)
 	: Command(clients, channels, fd, parsedCommand) {}
@@ -34,7 +34,7 @@ void Nick::execute()
 {
 	if (exceptionNick())
 		return ;
-	sendToClient(_fd, _parsedCommand[0], " " + _parsedCommand[1], CLIENT);
+	sendToClient(_fd, _parsedCommand[0], " :" + _parsedCommand[1], CLIENT);
 	_curUser.setNickName(_parsedCommand[1]);
 }
 ///connect -nocap localhost 6667 1234

@@ -31,7 +31,7 @@ bool Ping::exceptionPing()
 
 void Ping::pong()
 {
-	std::string result = "PONG " + _curUser.getServerName();
+	std::string result = "PONG " + _curUser.getServerName() + "\r\n";
 	 int n = send(_fd, result.c_str(), result.length(), 0);
 	 std::cout << result << std::endl;
     if (n == -1)
