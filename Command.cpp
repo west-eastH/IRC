@@ -49,7 +49,7 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
     const char *msg = success.c_str();
 	    
 	int result = send(clientFd, msg, std::strlen(msg), 0);
-	std::cout << msg << std::endl;
+	std::cout << "server to client = " << msg << std::endl;
     if (result == -1)
         throw new std::runtime_error("Error: send failed");
 }

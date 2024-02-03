@@ -22,7 +22,8 @@ bool Mode::exceptionMode()
 	}
 	if (_parsedCommand.size() < 3)
 	{
-		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+		if (_parsedCommand.size() != 2)
+			sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1].front() != '#')

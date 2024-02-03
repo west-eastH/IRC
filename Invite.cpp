@@ -26,8 +26,6 @@ void Invite::execute()
 	sendToClient(_fd, "341", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
 	
 	//301 추가해야할지도 모름
-	msg = "You are invited from " + _parsedCommand[2] + "\r\n";
-	send(targetFd, msg.c_str(), msg.length(), 0);
 	sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + _parsedCommand[2], CLIENT);
 }
 bool Invite::exceptionInvite()

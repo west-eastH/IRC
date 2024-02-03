@@ -68,7 +68,11 @@ void Join::execute()
 	if (_curUser.isRoot())
 		oper = true;
 	_curUser.channels[_parsedCommand[1]] = oper;
+	std::map<int, UserInfo*>::iterator it;
 	_channels[chIdx].joinChannel(_fd, _curUser);
+	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
+		sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1], CLIENT);
+	sendToClient(_fd, "332", _parsedCommand[1] + " :" +  _channels[chIdx].getTopic(), SERVER);
 	std::string members = _channels[chIdx].getMembers();
 	sendToClient(_fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
 	sendToClient(_fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);

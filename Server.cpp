@@ -268,9 +268,7 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 	return cmd;
 }
 
-
-
-//NICK phan3
+//NICK phan
 //USER phan phan 0 :pilho
-//WHOIS phan3
+//WHOIS phan
 //PING irc.libera.chat

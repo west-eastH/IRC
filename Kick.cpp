@@ -17,10 +17,10 @@ void Kick::execute()
 	chIdx = findChannel(_parsedCommand[1]);
 	_channels[chIdx].kickMember(targetFd);
 	std::string members = _channels[chIdx].getMembers();
-	sendToClient(_fd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " :" + (_parsedCommand.size() == 3 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
-	sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " :" + (_parsedCommand.size() == 3 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
-	sendToClient(_fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
-	sendToClient(_fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);
+	std::map<int, UserInfo*>::iterator it;
+	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
+		sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() == 4 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
+	sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() == 4 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
 }
 
 bool Kick::exceptionKick()
@@ -43,7 +43,10 @@ bool Kick::exceptionKick()
 	}
 	if (_curUser.channels[_parsedCommand[1]] == false)
 	{
-		sendToClient(_fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
+		// :localhossssssssssssst 482 feelgood_ #ttt :You're not a channel operator
+		// :zirconium.libera.chat 482 phan31 #aabbcc1 :You're not a channel operator
+		//:123 482 jonhan #qwer :You're not channel operator
+		sendToClient(_fd, "482", _parsedCommand[1] + " :You're not a channel operator", SERVER);
 		return true;
 	}	
 	int targetFd = findNick(_parsedCommand[2]);

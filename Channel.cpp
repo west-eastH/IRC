@@ -49,8 +49,8 @@ const std::string Channel::getMembers()
 
 void	Channel::joinChannel(int fd, UserInfo& user)
 {
-	if (_members.find(fd) != _members.end())
-		throw std::runtime_error("You are already in this channel!");
+	// if (_members.find(fd) != _members.end())
+	// 	throw std::runtime_error("You are already in this channel!");
 	
 	//if (_userCount >= _limit)
 	//	throw std::runtime_error("this channel is full!");
@@ -64,9 +64,7 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 
 void	Channel::kickMember(int fd)
 {
-	std::map<int, UserInfo*>::iterator it = _members.find(fd);
-	if (it == _members.end())
-		throw std::runtime_error("No exist member in channel!");
+	// std::map<int, UserInfo*>::iterator it = _members.find(fd);
 	_members.erase(fd);
 	_userCount--;
 }

@@ -61,7 +61,6 @@ void Topic::execute()
 
 	if (exceptionTopic())
 		return ;
-	
 	chIdx = findChannel(_parsedCommand[1]);
 	if (printTopic(chIdx))
 		return ;
@@ -69,6 +68,13 @@ void Topic::execute()
 	if (checkAuth(chIdx))
 		return ;
 
-	_channels[chIdx].setTopic(_parsedCommand[2]);
+	std::string topic = _parsedCommand[2];
+	size_t	pos = topic.find(':');
+	if (pos != std::string::npos)
+		topic = topic.erase(pos, 1);
+	_channels[chIdx].setTopic(topic);
+	std::map<int, UserInfo*>::iterator it;
+	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
+		sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " :" +  _channels[chIdx].getTopic(), CLIENT);
 	//_channels[chIdx].announce("The channel's topic has been changed to '" + _parsedCommand[2] + "'.\n");
 }
