@@ -65,7 +65,7 @@ void Join::execute()
 	chIdx = findChannel(_parsedCommand[1]);
 	if (!_curUser.isRoot() && checkChMode(chIdx))
 		return ;
-	if (_curUser.isRoot())
+	if (_curUser.isRoot() || _curUser.channels[_parsedCommand[1]])
 		oper = true;
 	_curUser.channels[_parsedCommand[1]] = oper;
 	std::map<int, UserInfo*>::iterator it;

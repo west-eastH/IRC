@@ -30,7 +30,7 @@ public:
 	int getUserCount() const;
 	const std::string getMembers();
 	void	joinChannel(int fd, UserInfo& user);
-	void	kickMember(int fd);
+	int		partChannel(int fd);
 	int		chopMember(const std::string& nick, bool op);
 	//void	announce(const std::string msg);
 	void	setMode(const std::string mode);

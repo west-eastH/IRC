@@ -15,12 +15,20 @@ void Kick::execute()
 		return ;
 	_clients[targetFd].channels.erase(_parsedCommand[1]);
 	chIdx = findChannel(_parsedCommand[1]);
-	_channels[chIdx].kickMember(targetFd);
 	std::string members = _channels[chIdx].getMembers();
 	std::map<int, UserInfo*>::iterator it;
 	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
+	{
 		sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() == 4 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
-	sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() == 4 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
+		// std::string prefix = _clients[targetFd].getNickName() + "!" + _clients[targetFd].getUserName() + "@" + _clients[targetFd].getServerName();
+		// std::string success = ":" + prefix + " " + "KICK" +  " " + _parsedCommand[1] + "\r\n";
+		// const char *msg = success.c_str();
+		// int result = send(it->first, msg, std::strlen(msg), 0);
+		// if (result == -1)
+		// 	throw new std::runtime_error("Error: send failed");
+	}
+	if (_channels[chIdx].partChannel(targetFd) == 0)
+		_channels.erase(_channels.begin() + chIdx);
 }
 
 bool Kick::exceptionKick()
@@ -50,6 +58,11 @@ bool Kick::exceptionKick()
 		return true;
 	}	
 	int targetFd = findNick(_parsedCommand[2]);
+	// if (targetFd == static_cast<int>(_fd))
+	// {
+	// 	sendToClient(_fd, "", _parsedCommand[2] + " " + _parsedCommand[1] + " :You can't kick yourself", SERVER);
+	// 	return true;
+	// }
 	if (targetFd == -1 || _clients[targetFd].channels.find(_parsedCommand[1]) == _clients[targetFd].channels.end())
 	{
 		sendToClient(_fd, "441", _parsedCommand[2] + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);

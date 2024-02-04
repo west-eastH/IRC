@@ -32,6 +32,8 @@ SRCS =	main.cpp \
 		Privmsg.cpp \
 		Mode.cpp \
 		Oper.cpp \
+		Part.cpp \
+		Quit.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

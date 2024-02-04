@@ -11,6 +11,8 @@
 #include "Ping.hpp"
 #include "WhoIs.hpp"
 #include "Privmsg.hpp"
+#include "Part.hpp"
+#include "Quit.hpp"
 
 Server::Server(char* port, char* password) : _serverName("localhost"), _password(password), _rootId("qwer"), _rootPw("1234")
 {
@@ -137,23 +139,31 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
     changeEvents(changeList, client_socket, EVFILT_WRITE);
     clients[client_socket].sendBuffer.clear();
 }
-
+#include <cstdio>
 std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 {
 	std::vector<Command*> cmds;
     char buf[1024];
-    int n = recv(currEvent.ident, buf, sizeof(buf), 0);
+	int totalN = 0;
+	while (std::strstr(buf, "\r\n") == 0)
+	{
+		int n = recv(currEvent.ident, buf + totalN, sizeof(buf) - totalN, 0);
+		if (n < 0)
+		{
+			std::cout << "EOF" << std::endl;
+			clients[currEvent.ident].sendBuffer += buf;
+			return cmds;
+		}
+		if (n == 0)
+		{
+			disconnectClient(currEvent.ident);
+			cmds.clear();
+			return cmds;
+		}
+		totalN += n;
+	}
 	std::vector<std::string> tokenizedBuffer;
-
-	if (n < 0)
-        throw std::runtime_error("receive error");
-    if (n == 0)
-    {
-        disconnectClient(currEvent.ident);
-		cmds.clear();
-		return cmds;
-    }
-	buf[n] = '\0';
+	buf[totalN] = '\0';
 	clients[currEvent.ident].sendBuffer += buf;
 	try
 	{
@@ -257,12 +267,10 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Oper(clients, channels, fd, buff, _rootId, _rootPw);
 	else if (buff.begin()->compare("MODE") == 0)
 		cmd = new Mode(clients, channels, fd, buff);
-	//else if (buff.begin()->compare("LIST") == 0)
-	//	cmd = new List();
-	//else if (buff.begin()->compare("QUIT") == 0)
-	//	cmd = new Quit();
-	//else if (buff.begin()->compare("PART") == 0)
-	//	cmd = new Part();
+	else if (buff.begin()->compare("PART") == 0)
+		cmd = new Part(clients, channels, fd, buff);
+	else if (buff.begin()->compare("QUIT") == 0)
+		cmd = new Quit(clients, channels, fd, buff);
 	else
 		throw(1);
 	return cmd;

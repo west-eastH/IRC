@@ -62,11 +62,12 @@ void	Channel::joinChannel(int fd, UserInfo& user)
 	announce(user.getNickName() + " join " + _name + " Channel!\r\n");*/
 }
 
-void	Channel::kickMember(int fd)
+int	Channel::partChannel(int fd)
 {
 	// std::map<int, UserInfo*>::iterator it = _members.find(fd);
 	_members.erase(fd);
 	_userCount--;
+	return _userCount;
 }
 /*
 void	Channel::announce(const std::string msg)
