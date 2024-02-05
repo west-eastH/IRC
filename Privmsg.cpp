@@ -51,7 +51,7 @@ void Privmsg::execute()
 				std::string msg;
 				for (size_t i = 2; i < _parsedCommand.size(); i++)
 					msg += _parsedCommand[i] + " ";
-				sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " :" + msg, CLIENT);
+				sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + msg, CLIENT);
 			}
 		}
 	}
@@ -61,7 +61,7 @@ void Privmsg::execute()
 		std::string msg;
 		for (size_t i = 2; i < _parsedCommand.size(); i++)
 			msg += _parsedCommand[i] + " ";
-		sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + msg, CLIENT);
+		sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + msg, CLIENT);
 	}
 }
 ///connect -nocap localhost 6667 1234

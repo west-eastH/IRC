@@ -47,7 +47,6 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
 		success = ":" + prefix + " " + cmd + " " + _curUser.getNickName() + " " + params + "\r\n";
 	}
     const char *msg = success.c_str();
-	    
 	int result = send(clientFd, msg, std::strlen(msg), 0);
     if (result == -1)
         throw new std::runtime_error("Error: send failed");
