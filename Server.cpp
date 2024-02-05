@@ -72,7 +72,7 @@ void Server::start(void)
         throw std::runtime_error("kqueue error");
 
     changeEvents(changeList, _socketFd, EVFILT_READ);
-    std::cout << "echo server started" << std::endl;
+    std::cout << "server started" << std::endl;
 
     while (1)
     {

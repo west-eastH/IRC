@@ -27,7 +27,6 @@ Join::~Join() {}
 
 bool Join::checkChMode(int chIdx)
 {
-	std::cout << "join ckmode : " << _channels[chIdx].getMode() << std::endl; 
 	if (_channels[chIdx].checkMode("k") && _channels[chIdx].getKey() != _parsedCommand[2])
 	{
 		sendToClient(_fd, "475", _parsedCommand[1] + " :Cannot join channel (+k)", SERVER);

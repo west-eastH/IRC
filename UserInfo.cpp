@@ -8,7 +8,6 @@ UserInfo::UserInfo() : _pass(false), _active(false), _root(false), _realName("na
 	_nickIdx++;
     std::string nick = ss.str();
     _nickName = nick;
-    std::cout << "UserInfo constructor called" << std::endl;
 }
 
 UserInfo::~UserInfo() {}
