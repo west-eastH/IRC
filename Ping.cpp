@@ -23,7 +23,7 @@ bool Ping::exceptionPing()
 	host_info = gethostbyname(_parsedCommand[1].c_str());
 	if (std::strcmp(_curUser.getServerName().c_str(), host_info->h_name))
 	{
-		sendToClient(_fd, "402",  _parsedCommand[0] + " :localhost :No such serverd", SERVER);
+		sendToClient(_fd, "402",  _parsedCommand[0] + " :" + _parsedCommand[1] + " :No such serverd", SERVER);
 		return true;
 	}
 	return false;

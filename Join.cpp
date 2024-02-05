@@ -53,6 +53,7 @@ void Join::execute()
 {
 	int chIdx = -1;
 	bool oper = false;
+
 	if (exceptionJoin())
 		return ;
 	if (_parsedCommand.size() == 2)
@@ -60,6 +61,13 @@ void Join::execute()
 	if ((findChannel(_parsedCommand[1])) == -1)
 	{
 		_channels.push_back(Channel(_parsedCommand[1], _parsedCommand[2]));
+		if (_parsedCommand[2].length())
+		{
+			std::string currMode = _channels.back().getMode();
+			currMode += "k";
+			_channels.back().setMode(currMode);
+			_channels.back().setKey(_parsedCommand[2]);
+		}
 		oper = true;
 	}
 	chIdx = findChannel(_parsedCommand[1]);

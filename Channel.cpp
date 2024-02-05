@@ -106,9 +106,9 @@ void Channel::setLimit(const int limit)
 
 void Channel::setKey(const std::string key)
 {
-	if (key == "")
-		_key.clear();
-	else
+	// if (key == "")
+	// 	_key.clear();
+	// else
 		_key = key;
 }
 

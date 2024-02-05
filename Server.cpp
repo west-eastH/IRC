@@ -115,13 +115,15 @@ void Server::start(void)
 				{
 					std::cerr << e.what() <<std::endl;
 				}
-				clients[cmds[0]->_fd].sendBuffer.clear();
 				for (size_t i = 0; i < cmds.size(); i++)
 				{
 					if (cmds[i])
 						delete cmds[i];
 				}
 				cmds.clear();
+				if (clients.find(currEvent->ident) == clients.end())
+					continue ;
+				clients[cmds[0]->_fd].sendBuffer.clear();
 			}
         }
         
@@ -139,49 +141,46 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
     changeEvents(changeList, client_socket, EVFILT_WRITE);
     clients[client_socket].sendBuffer.clear();
 }
-#include <cstdio>
+
 std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 {
 	std::vector<Command*> cmds;
     char buf[1024];
-	int totalN = 0;
-	while (std::strstr(buf, "\r\n") == 0)
+	int n;
+
+	std::vector<std::string> tokenizedBuffer;
+	n = recv(currEvent.ident, buf, sizeof(buf) - 1, 0);
+	buf[n] = '\0';
+	if (n < 0)
+		throw std::runtime_error("receive error");
+	else if (n == 0)
 	{
-		int n = recv(currEvent.ident, buf + totalN, sizeof(buf) - totalN, 0);
-		if (n < 0)
+		disconnectClient(currEvent.ident);
+		cmds.clear();
+		return cmds;
+	}
+	else
+		clients[currEvent.ident].sendBuffer += buf;
+	if (clients[currEvent.ident].sendBuffer.find("\r\n") != std::string::npos)
+	{
+		try
 		{
-			std::cout << "EOF" << std::endl;
-			clients[currEvent.ident].sendBuffer += buf;
-			return cmds;
+			//커맨드 단위 벡터 만들기
+			//단일 커맨드를 공백기준으로 잘라서
+			splitBuff(currEvent.ident, tokenizedBuffer);
+			for (size_t i = 0; i < tokenizedBuffer.size(); i++)
+			{
+				std::vector<std::string> token = splitSpace(tokenizedBuffer[i]);
+				if (token.size() != 0)
+					cmds.push_back(createCommand(currEvent.ident, token));
+			}
 		}
-		if (n == 0)
+		catch(int e)
 		{
-			disconnectClient(currEvent.ident);
+			clients[currEvent.ident].sendBuffer.clear();
 			cmds.clear();
 			return cmds;
 		}
-		totalN += n;
-	}
-	std::vector<std::string> tokenizedBuffer;
-	buf[totalN] = '\0';
-	clients[currEvent.ident].sendBuffer += buf;
-	try
-	{
-		//커맨드 단위 벡터 만들기
-		//단일 커맨드를 공백기준으로 잘라서
-		splitBuff(currEvent.ident, tokenizedBuffer);
-		for (size_t i = 0; i < tokenizedBuffer.size(); i++)
-		{
-			std::vector<std::string> token = splitSpace(tokenizedBuffer[i]);
-			if (token.size() != 0)
-				cmds.push_back(createCommand(currEvent.ident, token));
-		}
-	}
-	catch(int e)
-	{
-		clients[currEvent.ident].sendBuffer.clear();
-		cmds.clear();
-		return cmds;
 	}
 	return cmds;
 }
@@ -229,10 +228,6 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 	}
 	if (st.size() != 0)
 		vec.push_back(st);
-	// for (size_t i = 0; i < vec.size(); i++)
-	// {
-	// 	std::cout << vec[i] << std::endl;
-	// }
 	return vec;
 }
 

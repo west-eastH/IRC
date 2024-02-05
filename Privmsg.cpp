@@ -46,7 +46,12 @@ void Privmsg::execute()
 		std::map<int, UserInfo*>::iterator it;
 		for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
 			if (it->first != static_cast<int>(_fd))
-				sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " :" + _parsedCommand[2], CLIENT);
+			{
+				std::string msg;
+				for (size_t i = 2; i < _parsedCommand.size(); i++)
+					msg += _parsedCommand[i] + " ";
+				sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " :" + msg, CLIENT);
+			}
 	}
 	else
 	{
