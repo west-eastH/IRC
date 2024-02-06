@@ -50,7 +50,6 @@ void Server::create(void)
     fcntl(_socketFd, F_SETFL, O_NONBLOCK);
 }
 
-
 void Server::changeEvents(std::vector<struct kevent>& changeList, uintptr_t ident, int16_t filter)
 {
     struct kevent tempEvent;
@@ -70,11 +69,9 @@ void Server::start(void)
 
     if ((kq = kqueue()) == -1)
         throw std::runtime_error("kqueue error");
-
     changeEvents(changeList, _socketFd, EVFILT_READ);
     std::cout << "server started" << std::endl;
-
-    while (1)
+    while (true)
     {
         newEvents = kevent(kq, &changeList[0], changeList.size(), eventList, 8, NULL);
         if (newEvents == -1)
@@ -104,7 +101,6 @@ void Server::start(void)
 			{
 				try
 				{
-					// std::cout << "fd = " << cmds.front()->_fd << std::endl;
 					for (size_t i = 0; i < cmds.size(); i++)
 					{
 						if (cmds[i])
@@ -123,7 +119,7 @@ void Server::start(void)
 				cmds.clear();
 				if (clients.find(currEvent->ident) == clients.end())
 					continue ;
-				clients[cmds[0]->_fd].sendBuffer.clear();
+				clients[currEvent->ident].sendBuffer.clear();
 			}
         }
         
@@ -145,28 +141,33 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
 std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 {
 	std::vector<Command*> cmds;
-    char buf[1024];
+    char buf[512];
 	int n;
 
 	std::vector<std::string> tokenizedBuffer;
-	n = recv(currEvent.ident, buf, sizeof(buf) - 1, 0);
-	buf[n] = '\0';
-	if (n < 0)
-		throw std::runtime_error("receive error");
-	else if (n == 0)
+	while (true)
 	{
-		disconnectClient(currEvent.ident);
-		cmds.clear();
-		return cmds;
+		n = recv(currEvent.ident, buf, sizeof(buf) - 1, 0);
+		if (n < 0)
+			throw std::runtime_error("receive error");
+		else if (n == 0)
+		{
+			disconnectClient(currEvent.ident);
+			cmds.clear();
+			return cmds;
+		}
+		else
+		{
+			buf[n] = '\0';
+			clients[currEvent.ident].sendBuffer += buf;
+			if (std::strlen(buf) < 511)
+				break ;
+		}
 	}
-	else
-		clients[currEvent.ident].sendBuffer += buf;
 	if (clients[currEvent.ident].sendBuffer.find("\r\n") != std::string::npos)
 	{
 		try
 		{
-			//커맨드 단위 벡터 만들기
-			//단일 커맨드를 공백기준으로 잘라서
 			splitBuff(currEvent.ident, tokenizedBuffer);
 			for (size_t i = 0; i < tokenizedBuffer.size(); i++)
 			{
@@ -202,12 +203,9 @@ void Server::splitBuff(uintptr_t fd, std::vector<std::string>& buff)
 		buff.push_back(cmdTemp);
     	clients[fd].sendBuffer.erase(0, pos + 2);
 		pos = clients[fd].sendBuffer.find("\r\n");
-		// if (buff.size() == 0)
-		// 	throw(1);
 	}
 	if (clients[fd].sendBuffer.size() != 0)
 	{
-		// std::cout << "파싱 꼬레" <<  clients[fd].sendBuffer << std::endl;
 		buff.push_back(clients[fd].sendBuffer);
 	}
 }
@@ -235,9 +233,7 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 {
 	Command*	cmd	= NULL;
 
-// 여기서 buff에 명령어 리스트들이 들어있어서 반복문 돌면서 해야하는데 어떻게 해야할까
 
-	// 그냥 split(buff.begin())->compare("PASS") 요렇게!!!
 	if (buff.begin()->compare("PASS") == 0)
 		cmd = new Pass(clients, channels, fd, buff, _password);
 	else if (buff.begin()->compare("NICK") == 0)

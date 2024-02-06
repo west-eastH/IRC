@@ -3,7 +3,7 @@ bool Quit::exceptionQuit()
 {
 	if (_curUser.isPass() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	return false;
@@ -24,11 +24,10 @@ void Quit::execute()
 		int chIdx = findChannel(iter->first);
 		std::map<int, UserInfo*>::iterator it;
 		for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
-			sendToClient(it->first, "PART", " " + iter->first, CLIENT);
+			sendToClient(_curUser, it->first, "PART", " " + iter->first, CLIENT);
 		if (_channels[chIdx].partChannel(_fd) == 0)
 			_channels.erase(_channels.begin() + chIdx);
 	}
 	close(_fd);
 	_clients.erase(_fd);
 }
-///connect -nocap localhost 6667 1234

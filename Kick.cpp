@@ -5,75 +5,59 @@ Kick::Kick(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uin
 
 Kick::~Kick() {}
 
-void Kick::execute()
-{
-	int chIdx = -1;
-	int targetFd = findNick(_parsedCommand[2]);
-	std::string msg;
-
-	if (exceptionKick())
-		return ;
-	_clients[targetFd].channels.erase(_parsedCommand[1]);
-	chIdx = findChannel(_parsedCommand[1]);
-	std::string members = _channels[chIdx].getMembers();
-	std::map<int, UserInfo*>::iterator it;
-	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
-	{
-		sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() == 4 ? _parsedCommand[3] : _parsedCommand[2]), CLIENT);
-		// std::string prefix = _clients[targetFd].getNickName() + "!" + _clients[targetFd].getUserName() + "@" + _clients[targetFd].getServerName();
-		// std::string success = ":" + prefix + " " + "KICK" +  " " + _parsedCommand[1] + "\r\n";
-		// const char *msg = success.c_str();
-		// int result = send(it->first, msg, std::strlen(msg), 0);
-		// if (result == -1)
-		// 	throw new std::runtime_error("Error: send failed");
-	}
-	if (_channels[chIdx].partChannel(targetFd) == 0)
-		_channels.erase(_channels.begin() + chIdx);
-}
-
 bool Kick::exceptionKick()
 {
 	int channelFd = findChannel(_parsedCommand[1]);
 	if (_curUser.isActive() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 3 || _parsedCommand.size() > 4)
 	{
-		sendToClient(_fd, "431", " :No nickname given", SERVER);
+		sendToClient(_curUser, _fd, "431", " :No nickname given", SERVER);
 		return true;
 	}
 	if (_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
 	{
-		sendToClient(_fd, "442", _parsedCommand[1] + " :You're not on that channel", SERVER);
+		sendToClient(_curUser, _fd, "442", _parsedCommand[1] + " :You're not on that channel", SERVER);
 		return true;
 	}
 	if (_curUser.channels[_parsedCommand[1]] == false)
 	{
-		// :localhossssssssssssst 482 feelgood_ #ttt :You're not a channel operator
-		// :zirconium.libera.chat 482 phan31 #aabbcc1 :You're not a channel operator
-		//:123 482 jonhan #qwer :You're not channel operator
-		sendToClient(_fd, "482", _parsedCommand[1] + " :You're not a channel operator", SERVER);
+		sendToClient(_curUser, _fd, "482", _parsedCommand[1] + " :You're not a channel operator", SERVER);
 		return true;
 	}	
 	int targetFd = findNick(_parsedCommand[2]);
-	// if (targetFd == static_cast<int>(_fd))
-	// {
-	// 	sendToClient(_fd, "", _parsedCommand[2] + " " + _parsedCommand[1] + " :You can't kick yourself", SERVER);
-	// 	return true;
-	// }
 	if (targetFd == -1 || _clients[targetFd].channels.find(_parsedCommand[1]) == _clients[targetFd].channels.end())
 	{
-		sendToClient(_fd, "441", _parsedCommand[2] + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
+		sendToClient(_curUser, _fd, "441", _parsedCommand[2] + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
 		return true;
 	}
 	if (channelFd == -1)
 	{
-		sendToClient(_fd, "403", _parsedCommand[1] + " :No such Channel", SERVER);
+		sendToClient(_curUser, _fd, "403", _parsedCommand[1] + " :No such Channel", SERVER);
 		return true;
 	}
-	// if (_curUser.getNickName() == _clients[targetFd].getNickName())
-	// 	throw std::runtime_error("Can not kick yourself!!");
 	return false;
+}
+
+void Kick::execute()
+{
+	int chIdx = -1;
+	int targetFd;
+	std::string msg;
+
+	if (exceptionKick())
+		return ;
+	targetFd = findNick(_parsedCommand[2]);
+	_clients[targetFd].channels.erase(_parsedCommand[1]);
+	chIdx = findChannel(_parsedCommand[1]);
+	std::map<int, UserInfo*>::iterator it;
+	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
+	{
+		sendToClient(_curUser, it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() >= 4 ? makeMsg(3) : _parsedCommand[2]), CLIENT);
+	}
+	if (_channels[chIdx].partChannel(targetFd) == 0)
+		_channels.erase(_channels.begin() + chIdx);
 }

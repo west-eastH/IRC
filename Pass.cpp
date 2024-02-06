@@ -3,9 +3,8 @@
 Pass::Pass(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand, std::string password)
 	: Command(clients, channels, fd, parsedCommand), _password(password) {}
 
-Pass::~Pass()
-{
-}
+Pass::~Pass() {}
+
 void Pass::execute()
 {
 	if (exceptionPass())
@@ -20,12 +19,12 @@ bool Pass::exceptionPass()
 {
 	if (_curUser.isActive() == true)
 	{
-		sendToClient(_fd, "462", " :Unauthorized command (already registered)", SERVER);
+		sendToClient(_curUser, _fd, "462", " :Unauthorized command (already registered)", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() != 2)
 	{
-		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+		sendToClient(_curUser, _fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	return false;

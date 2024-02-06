@@ -6,11 +6,6 @@ Command::Command(std::map<int, UserInfo>& clients, std::vector<Channel>& channel
 
 Command::~Command() {}
 
-void Command::putString(const int fd, const std::string& str) const
-{
-	write(fd, str.c_str(), str.length());
-}
-
 int Command::findNick(const std::string& nick) const
 {
 	std::map<int ,UserInfo>::iterator it;
@@ -31,20 +26,20 @@ int	Command::findChannel(const std::string& name) const
 	}
 	return -1;
 }
-//[ ":" prefix SPACE ] command [ params ] crlf
-void Command::sendToClient(int clientFd, std::string cmd, std::string params, bool flag)
+
+void Command::sendToClient(UserInfo& sender, int clientFd, std::string cmd, std::string params, bool flag)
 {
 	std::string prefix;
 	std::string success;
-	if (flag == CLIENT) // prefix -> USER
+	if (flag == CLIENT)
 	{
-		prefix = _curUser.getNickName() + "!" + _curUser.getUserName() + "@" + _curUser.getServerName();
+		prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
 		success = ":" + prefix + " " + cmd + params + "\r\n";
 	}
 	else
 	{
-		prefix = _curUser.getServerName();
-		success = ":" + prefix + " " + cmd + " " + _curUser.getNickName() + " " + params + "\r\n";
+		prefix = sender.getServerName();
+		success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
 	}
     const char *msg = success.c_str();
 	int result = send(clientFd, msg, std::strlen(msg), 0);
@@ -62,42 +57,10 @@ bool Command::isPrintable(const std::string str)
 	return true;
 }
 
-
-
-/*
-:molybdenum.libera.chat 353 phan @ #test321321 :@phan
-:molybdenum.libera.chat 366 phan #test321321 :End of /NAMES list.
-:phan22!~phan@121.135.181.41 JOIN #test321321
-
-
-:molybdenum.libera.chat 353 phan22 @ #test321321 :phan22 @phan
-:molybdenum.libera.chat 366 phan22 #test321321 :End of /NAMES list.*/
-
-/*
-void Command::updateMembers(Channel &channel)
+std::string Command::makeMsg(size_t idx)
 {
 	std::string msg;
-	std::map<int, UserInfo*>::iterator it;
-	const char *success;
-	for (it = channel._members.begin(); it != channel._members.end(); ++it)
-	{
-		msg = ":" + it->second->getServerName() + " 353 " + it->second->getNickName() + " = " + channel.getName() + " :" + channel.getMembers() + "\r\n";
-		success = msg.c_str();
-		send(it->first, success, msg.length(), 0);
-		std::cout << msg << std::endl;
-		msg = ":" + it->second->getServerName() + " 366 " + it->second->getNickName() + " " + channel.getName() + " :End of /NAMES list\r\n";
-		success = msg.c_str();
-		send(it->first, success, msg.length(), 0);
-		std::cout << msg << std::endl;
-	}
-}*/
-/* 
-Command::CommandError::CommandError(std::string errCode, std::string errCmd, std::string msg) : _msg(errCode + " " + errCmd + " :" + msg + "\r\n") {}
-
-Command::CommandError::~CommandError() throw() {}
-
-const char* Command::CommandError::what() const throw()
-{
-	return _msg.c_str();
+	for (size_t i = idx; i < _parsedCommand.size(); i++)
+		msg += _parsedCommand[i] + " ";
+	return msg;
 }
- */

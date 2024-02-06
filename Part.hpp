@@ -9,5 +9,4 @@ class Part : public Command
 		~Part();
 		void execute();
 		bool exceptionPart();
-
 };

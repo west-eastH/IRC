@@ -1,14 +1,5 @@
 #include "Mode.hpp"
 
-// +i: 채널에 접근을 초대된 사용자에게만 허용합니다.
-// +t: 채널의 주제를 오직 운영자만 설정할 수 있게 합니다.
-// +k: 채널에 입장하기 위해 비밀번호가 필요하도록 합니다.
-// l: Set/remove the user limit to channel
-// · o: Give/take channel operator privilege
-
-// 사용자 모드의 예는 다음과 같습니다:
-// +o: 사용자에게 운영자 권한을 부여합니다.
-
 Mode::Mode(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand) : Command(clients, channels, fd, parsedCommand) {}
 
 Mode::~Mode() {}
@@ -17,13 +8,13 @@ bool Mode::exceptionMode()
 {
 	if (_curUser.isActive() != true)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :Activate first!", SERVER);
+		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :Activate first!", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 3)
 	{
 		if (_parsedCommand.size() != 2)
-			sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+			sendToClient(_curUser, _fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1].front() != '#')
@@ -31,7 +22,7 @@ bool Mode::exceptionMode()
 	if ((_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end()
 		|| _curUser.channels[_parsedCommand[1]] == false))
 	{
-		sendToClient(_fd, "482", _parsedCommand[0] + " :You are not channel operator!!", SERVER);
+		sendToClient(_curUser, _fd, "482", _parsedCommand[0] + " :You are not channel operator!!", SERVER);
 		return true;
 	}
 	return false;		
@@ -45,8 +36,6 @@ void Mode::execute()
 		return ;
 	if (checkParams(_parsedCommand[2]) == false)
 		return ;
-	// if (checkMode(_channels[findChannel(_parsedCommand[1])], _parsedCommand[2]) == false)
-	// 	throw std::runtime_error("Invaild mode flag!!");
 	chmod(_channels[findChannel(_parsedCommand[1])], _parsedCommand[2]);
 	std::cout << "mode : " << _channels[findChannel(_parsedCommand[1])].getMode() << std::endl;
 }
@@ -60,7 +49,7 @@ bool Mode::checkMode(const std::string& mode)
 		if (modeList.find(mode[i]) == std::string::npos)
 		{
 			std::string errMsg = mode + " :is unknown mode char to me for " + _parsedCommand[1];
-			sendToClient(_fd, "472", errMsg, SERVER);
+			sendToClient(_curUser, _fd, "472", errMsg, SERVER);
 			return false;
 		}
 	}
@@ -93,7 +82,6 @@ bool Mode::checkParams(const std::string& mode)
 
 void Mode::chmod(Channel& channel, const std::string& mode)
 {
-	//============================================TODO===============================================
 	int opCode = '+';
 	static bool (Mode::*chmodFunc[5])(Channel& channel, const int opCode, const std::string& param) = {&Mode::changeModeI, &Mode::changeModeT, &Mode::changeModeK, &Mode::changeModeL, &Mode::changeModeO};
 	const std::string modeList = "itklo";
@@ -113,9 +101,9 @@ void Mode::chmod(Channel& channel, const std::string& mode)
 			if (successChangeMode)
 			{
 				if (mode[i] == 'o')
-					sendToClient(_fd, "325", _parsedCommand[1] + _parsedCommand[2 + paramIdx], SERVER);
+					sendToClient(_curUser, _fd, "325", _parsedCommand[1] + _parsedCommand[2 + paramIdx], SERVER);
 				else
-					sendToClient(_fd, "324", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
+					sendToClient(_curUser, _fd, "324", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
 			}
 		}
 	}
@@ -174,7 +162,7 @@ bool Mode::changeModeK(Channel& channel, const int opCode, const std::string& pa
 	{
 		if (pos != std::string::npos)
 		{
-			sendToClient(_fd, "467", _parsedCommand[1] + " :Channel key already set", SERVER);
+			sendToClient(_curUser, _fd, "467", _parsedCommand[1] + " :Channel key already set", SERVER);
 			return false;
 		}
 		std::string currMode = channel.getMode();
@@ -229,7 +217,7 @@ bool Mode::changeModeO(Channel& channel, const int opCode, const std::string& pa
 	int res = channel.chopMember(param, modeO);
 	if (res < 0)
 	{
-		sendToClient(_fd, "441", param + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
+		sendToClient(_curUser, _fd, "441", param + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
 		return false;
 	}
 	if (res == 0)

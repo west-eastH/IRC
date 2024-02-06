@@ -9,5 +9,4 @@ class Kick : public Command
 		~Kick();
 		void execute();
 		bool exceptionKick();
-
 };

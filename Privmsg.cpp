@@ -4,29 +4,29 @@ bool Privmsg::exceptionPrivmsg()
 {
 	if (_curUser.isPass() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() == 1)
 	{
-		sendToClient(_fd, "411", " :No recipient given (" + _parsedCommand[0] + ")", SERVER);
+		sendToClient(_curUser, _fd, "411", " :No recipient given (" + _parsedCommand[0] + ")", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() == 2)
 	{
-		sendToClient(_fd, "412", " :No text to send", SERVER);
+		sendToClient(_curUser, _fd, "412", " :No text to send", SERVER);
 		return true;
 	}
 	int targetFd;
 	if ((_parsedCommand[1].front() != '#' && ((targetFd = findNick(_parsedCommand[1])) == -1 || !_clients[targetFd].isActive()))
 		|| (_parsedCommand[1].front() == '#' && findChannel(_parsedCommand[1]) == -1))
 	{
-		sendToClient(_fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
+		sendToClient(_curUser, _fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1].front() == '#' && _curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
 	{
-		sendToClient(_fd, "404", _parsedCommand[1] + " :Cannot send to channel", SERVER);
+		sendToClient(_curUser, _fd, "404", _parsedCommand[1] + " :Cannot send to channel", SERVER);
 		return true;
 	}
 	return false;
@@ -47,21 +47,12 @@ void Privmsg::execute()
 		for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
 		{
 			if (it->first != static_cast<int>(_fd))
-			{
-				std::string msg;
-				for (size_t i = 2; i < _parsedCommand.size(); i++)
-					msg += _parsedCommand[i] + " ";
-				sendToClient(it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + msg, CLIENT);
-			}
+				sendToClient(_curUser, it->first, _parsedCommand[0], " " + _parsedCommand[1] + " " + makeMsg(2), CLIENT);
 		}
 	}
 	else
 	{
 		int targetFd = findNick(_parsedCommand[1]);
-		std::string msg;
-		for (size_t i = 2; i < _parsedCommand.size(); i++)
-			msg += _parsedCommand[i] + " ";
-		sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + msg, CLIENT);
+		sendToClient(_curUser, targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + makeMsg(2), CLIENT);
 	}
 }
-///connect -nocap localhost 6667 1234

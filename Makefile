@@ -14,7 +14,7 @@ LINE_CLEAR  =   "\x1b[1A\x1b[M"
 #-------------------------------------------
 NAME = a.out
 CXX	= c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -fsanitize=address -g3 -std=c++98
 SRCS =	main.cpp \
 		Server.cpp \
 		UserInfo.cpp \
