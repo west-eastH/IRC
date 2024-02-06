@@ -4,19 +4,19 @@
 
 class Mode : public Command
 {
-private:
-	bool exceptionMode();
-	bool checkMode(const std::string& mode);
-	bool checkParams(const std::string& mode);
+	private:
+		bool exceptionMode();
+		bool checkMode(const std::string& mode);
+		bool checkParams(const std::string& mode);
 
-	void chmod(Channel& channel, const std::string& mode);
-	bool changeModeI(Channel& channel, const int opCode, const std::string& param);
-	bool changeModeT(Channel& channel, const int opCode, const std::string& param);
-	bool changeModeK(Channel& channel, const int opCode, const std::string& param);
-	bool changeModeL(Channel& channel, const int opCode, const std::string& param);
-	bool changeModeO(Channel& channel, const int opCode, const std::string& param);
-public:
-	Mode(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
-	~Mode();
-	void execute();
+		void chmod(Channel& channel, const std::string& mode);
+		bool changeModeI(Channel& channel, const int opCode, const std::string& param);
+		bool changeModeT(Channel& channel, const int opCode, const std::string& param);
+		bool changeModeK(Channel& channel, const int opCode, const std::string& param);
+		bool changeModeL(Channel& channel, const int opCode, const std::string& param);
+		bool changeModeO(Channel& channel, const int opCode, const std::string& param);
+	public:
+		Mode(std::map<int, UserInfo>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
+		~Mode();
+		void execute();
 };

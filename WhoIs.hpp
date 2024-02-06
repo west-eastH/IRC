@@ -4,12 +4,12 @@
 
 class WhoIs : public Command
 {
-private:
-	bool exceptionWhoIs();
+	private:
+		bool exceptionWhoIs();
 
-public:
-	WhoIs(std::map<int, UserInfo> &clients, std::vector<Channel> &channels, uintptr_t fd, std::vector<std::string> parsedCommand);
-	~WhoIs();
+	public:
+		WhoIs(std::map<int, UserInfo> &clients, std::vector<Channel> &channels, uintptr_t fd, std::vector<std::string> parsedCommand);
+		~WhoIs();
 
-	virtual void execute();
+		virtual void execute();
 };
