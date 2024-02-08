@@ -1,33 +1,34 @@
 #include "Quit.hpp"
-bool Quit::exceptionQuit()
-{
-	if (_curUser.isPass() == false)
-	{
-		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
-		return true;
-	}
-	return false;
-}
 
-Quit::Quit(std::map<int, UserAccount> &clients, std::vector<Channel> &channels, uintptr_t fd, std::vector<std::string> parsedCommand)
-	: Command(clients, channels, fd, parsedCommand) {}
+Quit::Quit(uintptr_t fd, std::vector<std::string> parsedCommand)
+	: Command(fd, parsedCommand) {}
 
 Quit::~Quit() {}
 
 void Quit::execute()
 {
-	if (exceptionQuit())
+	if (handleException())
 		return ;
-	std::map<std::string, bool>::iterator iter;
-	for (iter = _curUser.channels.begin(); iter != _curUser.channels.end(); ++iter)
+	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	std::vector<int> currentChannelList = curUser.getChannels();
+	for (size_t i = 0; i < currentChannelList.size(); i++)
 	{
-		int chIdx = findChannel(iter->first);
-		std::map<int, UserAccount*>::iterator it;
-		for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
-			sendToClient(_curUser, it->first, "PART", " " + iter->first, CLIENT);
-		if (_channels[chIdx].partChannel(_fd) == 0)
-			_channels.erase(_channels.begin() + chIdx);
+		Channel& channel = Database::getInstance()->getChannel(currentChannelList[i]);
+		channel.announce("PART", " " + channel.getName());
+		if (channel.partChannel(_fd) == 0)
+			Database::getInstance()->deleteChannel(currentChannelList[i]);
 	}
 	close(_fd);
-	_clients.erase(_fd);
+	Database::getInstance()->deleteAccount(_fd);
+}
+
+bool Quit::handleException()
+{
+	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	if (curUser.isPass() == false)
+	{
+		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		return true;
+	}
+	return false;
 }

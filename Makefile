@@ -31,7 +31,6 @@ CMDS_NAME =	Pass.cpp \
 			Nick.cpp \
 			User.cpp \
 			Ping.cpp \
-			WhoIs.cpp \
 			Join.cpp \
 			Kick.cpp \
 			Invite.cpp \

@@ -1,28 +1,31 @@
 #include "Mode.hpp"
 
-Mode::Mode(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand) : Command(clients, channels, fd, parsedCommand) {}
+Mode::Mode(uintptr_t fd, std::vector<std::string> parsedCommand)
+	: Command(fd, parsedCommand) {}
 
 Mode::~Mode() {}
 
-bool Mode::exceptionMode()
+bool Mode::handleException()
 {
-	if (_curUser.isActive() != true)
+	Database* DB = Database::getInstance();
+
+	if (DB->getAccount(_fd).isActive() != true)
 	{
-		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :Activate first!", SERVER);
+		sendToClient(_fd, "", _parsedCommand[0] + " :Activate first!", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 3)
 	{
 		if (_parsedCommand.size() != 2)
-			sendToClient(_curUser, _fd, "461", " :Not enough parameters", SERVER);
+			sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1].front() != '#')
 		return true;
-	if ((_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end()
-		|| _curUser.channels[_parsedCommand[1]] == false))
+	Channel& curChannel = DB->getChannel(DB->search(_parsedCommand[1], CHANNEL));
+	if (curChannel.isMemberExists(_fd) || curChannel.isAdmin(_fd))
 	{
-		sendToClient(_curUser, _fd, "482", _parsedCommand[0] + " :You are not channel operator!!", SERVER);
+		sendToClient(_fd, "482", _parsedCommand[0] + " :You are not channel operator!!", SERVER);
 		return true;
 	}
 	return false;		
@@ -30,14 +33,15 @@ bool Mode::exceptionMode()
 
 void Mode::execute()
 {
-	if (exceptionMode())
+	if (handleException())
 		return ;
 	if (checkMode(_parsedCommand[2]) == false)
 		return ;
 	if (checkParams(_parsedCommand[2]) == false)
 		return ;
-	chmod(_channels[findChannel(_parsedCommand[1])], _parsedCommand[2]);
-	std::cout << "mode : " << _channels[findChannel(_parsedCommand[1])].getMode() << std::endl;
+	Database *DB = Database::getInstance();
+	Channel& curChannel = DB->getChannel(DB->search(_parsedCommand[1], CHANNEL));
+	chmod(curChannel, _parsedCommand[2]);
 }
 
 bool Mode::checkMode(const std::string& mode)
@@ -49,11 +53,10 @@ bool Mode::checkMode(const std::string& mode)
 		if (modeList.find(mode[i]) == std::string::npos)
 		{
 			std::string errMsg = mode + " :is unknown mode char to me for " + _parsedCommand[1];
-			sendToClient(_curUser, _fd, "472", errMsg, SERVER);
+			sendToClient(_fd, "472", errMsg, SERVER);
 			return false;
 		}
 	}
-	std::cout << "chk mode" << std::endl;
 	return true;
 }
 
@@ -76,7 +79,6 @@ bool Mode::checkParams(const std::string& mode)
 	}
 	if (commandParamsSize != requiredParamsCount)
 		return false;
-	std::cout << "ck param" << std::endl;
 	return true;
 }
 
@@ -101,9 +103,9 @@ void Mode::chmod(Channel& channel, const std::string& mode)
 			if (successChangeMode)
 			{
 				if (mode[i] == 'o')
-					sendToClient(_curUser, _fd, "325", _parsedCommand[1] + _parsedCommand[2 + paramIdx], SERVER);
+					sendToClient(_fd, "325", _parsedCommand[1] + _parsedCommand[2 + paramIdx], SERVER);
 				else
-					sendToClient(_curUser, _fd, "324", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
+					sendToClient(_fd, "324", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
 			}
 		}
 	}
@@ -162,7 +164,7 @@ bool Mode::changeModeK(Channel& channel, const int opCode, const std::string& pa
 	{
 		if (pos != std::string::npos)
 		{
-			sendToClient(_curUser, _fd, "467", _parsedCommand[1] + " :Channel key already set", SERVER);
+			sendToClient(_fd, "467", _parsedCommand[1] + " :Channel key already set", SERVER);
 			return false;
 		}
 		std::string currMode = channel.getMode();
@@ -217,7 +219,7 @@ bool Mode::changeModeO(Channel& channel, const int opCode, const std::string& pa
 	int res = channel.chopMember(param, modeO);
 	if (res < 0)
 	{
-		sendToClient(_curUser, _fd, "441", param + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
+		sendToClient(_fd, "441", param + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);
 		return false;
 	}
 	if (res == 0)

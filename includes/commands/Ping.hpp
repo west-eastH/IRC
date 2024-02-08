@@ -9,7 +9,7 @@ class Ping : public Command
 		void pong();
 		bool handleException();
 	public:
-		Ping(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
+		Ping(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Ping();
 		void execute();
 };

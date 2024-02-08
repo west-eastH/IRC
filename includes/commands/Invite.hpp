@@ -4,9 +4,11 @@
 
 class Invite : public Command
 {
+	private:
+		bool handleException();
+
 	public:
-		Invite(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
+		Invite(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Invite();
 		void execute();
-		bool exceptionInvite();
 };

@@ -1,37 +1,40 @@
 #include "Topic.hpp"
 
-Topic::Topic(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand)
-	: Command(clients, channels, fd, parsedCommand) {}
+Topic::Topic(uintptr_t fd, std::vector<std::string> parsedCommand)
+	: Command(fd, parsedCommand) {}
 
 Topic::~Topic() {}
 
-bool Topic::exceptionTopic()
+bool Topic::handleException()
 {
-	if (_curUser.isActive() == false)
+	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	if (curUser.isActive() == false)
 	{
-		sendToClient(_curUser, _fd, "", "You need to login first", SERVER);
+		sendToClient(_fd, "", "You need to login first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
 	{
-		sendToClient(_curUser, _fd, "461", " :Not enough parameters", SERVER);
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
-	if (_curUser.channels.find(_parsedCommand[1]) == _curUser.channels.end())
+	Channel& curChannel = Database::getInstance()->getChannel(findChannel(_parsedCommand[1]));
+	if (curChannel.isMemberExists(_fd))
 	{
-		sendToClient(_curUser, _fd, "442", _parsedCommand[1] + " :You're not on that channel" , SERVER);
+		sendToClient(_fd, "442", _parsedCommand[1] + " :You're not on that channel" , SERVER);
 		return true;
 	}
 	return false;
 }
 bool Topic::printTopic(int chIdx)
 {
+	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
 	if (_parsedCommand.size() == 2)
 	{
-		if (_channels[chIdx].getTopic().length() == 0)
-			sendToClient(_curUser, _fd, "331", _parsedCommand[1] + " :No topic is set", SERVER);
+		if (curChannel.getTopic().length() == 0)
+			sendToClient(_fd, "331", _parsedCommand[1] + " :No topic is set", SERVER);
 		else
-			sendToClient(_curUser, _fd, "332", _parsedCommand[1] + " :" +  _channels[chIdx].getTopic(), SERVER);
+			sendToClient(_fd, "332", _parsedCommand[1] + " :" +  curChannel.getTopic(), SERVER);
 		return true;
 	}
 	return false;
@@ -39,9 +42,10 @@ bool Topic::printTopic(int chIdx)
 
 bool Topic::checkAuth(int chIdx)
 {
-	if (_channels[chIdx].checkMode("t") && _curUser.channels[_parsedCommand[1]] == false)
+	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
+	if (curChannel.checkMode("t") && curChannel.isAdmin(_fd) == false)
 	{
-		sendToClient(_curUser, _fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
+		sendToClient( _fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
 		return true;
 	}
 	return false;
@@ -52,7 +56,7 @@ void Topic::execute()
 	int chIdx = -1;
 	std::string msg;
 
-	if (exceptionTopic())
+	if (handleException())
 		return ;
 	chIdx = findChannel(_parsedCommand[1]);
 	if (printTopic(chIdx))
@@ -60,13 +64,12 @@ void Topic::execute()
 
 	if (checkAuth(chIdx))
 		return ;
-
-	std::string topic = makeMsg(2);
+	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
+	std::string topic = makeMessage(2);
 	size_t	pos = topic.find(':');
 	if (pos != std::string::npos)
 		topic = topic.erase(pos, 1);
-	_channels[chIdx].setTopic(topic);
+	curChannel.setTopic(topic);
 	std::map<int, UserAccount*>::iterator it;
-	for (it = _channels[chIdx]._members.begin(); it != _channels[chIdx]._members.end(); ++it)
-		sendToClient(_curUser, it->first, _parsedCommand[0], " " + _parsedCommand[1] + " :" +  _channels[chIdx].getTopic(), CLIENT);
+	curChannel.announce(_parsedCommand[0], " " + _parsedCommand[1] + " :" + curChannel.getTopic());
 }

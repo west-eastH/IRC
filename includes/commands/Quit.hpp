@@ -5,9 +5,10 @@
 class Quit : public Command
 {
 	private:
-		bool exceptionQuit();
+		bool handleException();
+
 	public:
-		Quit(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
+		Quit(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Quit();
 
 		virtual void execute();

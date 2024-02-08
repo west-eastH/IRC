@@ -1,38 +1,40 @@
 #include "Oper.hpp"
 
-Oper::Oper(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand, std::string id, std::string password)
-	: Command(clients, channels, fd, parsedCommand), _rootId(id), _rootPw(password) {}
+Oper::Oper(uintptr_t fd, std::vector<std::string> parsedCommand, std::string id, std::string password)
+	: Command(fd, parsedCommand), _rootId(id), _rootPw(password) {}
 
 Oper::~Oper() {}
 
 void Oper::execute()
 {
-	if (exceptionOper())
+	if (handleException())
 		return ;
-	_curUser.authorize();
-	sendToClient(_curUser, _fd, "381", " :You are now an IRC operator", SERVER);
+	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	curUser.authorize();
+	sendToClient(_fd, "381", " :You are now an IRC operator", SERVER);
 }
 
-bool Oper::exceptionOper()
+bool Oper::handleException()
 {
-	if (_curUser.isActive() == false)
+	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	if (curUser.isActive() == false)
 	{
-		sendToClient(_curUser, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() != 3)
 	{
-		sendToClient(_curUser, _fd, "461", " :Not enough parameters", SERVER);
+		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1] != _rootId || _parsedCommand[2] != _rootPw)
 	{
-		sendToClient(_curUser, _fd, "464", " :Password incorrect", SERVER);
+		sendToClient(_fd, "464", " :Password incorrect", SERVER);
 		return true;
 	}
-	if (_curUser.isRoot())
+	if (curUser.isRoot())
 	{
-		sendToClient(_curUser, _fd, "", " You are already root!", SERVER);
+		sendToClient(_fd, "", " You are already root!", SERVER);
 		return true;
 	}
 	return false;

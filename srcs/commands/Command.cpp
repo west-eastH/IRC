@@ -48,10 +48,15 @@ bool Command::isPrintable(const std::string& str)
 	return true;
 }
 
-std::string Command::makeMsg(size_t idx)
+std::string Command::makeMessage(size_t idx)
 {
 	std::string msg;
 	for (size_t i = idx; i < _parsedCommand.size(); i++)
 		msg += _parsedCommand[i] + " ";
 	return msg;
+}
+
+uintptr_t Command::getFd() const
+{
+	return _fd;
 }

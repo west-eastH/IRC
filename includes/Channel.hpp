@@ -19,15 +19,8 @@ class Channel {
 		std::string	_key;
 		std::string	_topic;
 		std::string	_mode;
-
-/////////////////////////////////////////////////////
 		std::map< uintptr_t, std::pair<bool, bool> > _members; //fd, oper, online
-
-
-/////////////////////////////////////////////////////
 	public:
-		//std::map<int, UserAccount*>	_members;
-		//std::vector<std::string>	inviteMembers; 
 		Channel(std::string name, std::string key);
 		~Channel();
 
@@ -40,9 +33,10 @@ class Channel {
 		int		getUserCount() const;
 		int		partChannel(int fd);
 		int		chopMember(const std::string& nick, bool op);
-		bool	isMemberExists(uintptr_t fd) const;
+		bool	isMemberExists(uintptr_t fd);
+		bool	isAdmin(uintptr_t fd);
 		bool	checkMode(const std::string& mode);
-		void	joinChannel(int fd, bool oper, bool status);
+		void	joinChannel(uintptr_t fd, bool oper, bool status);
 		void	setMode(const std::string mode);
 		void	setTopic(const std::string topic);
 		void	setLimit(const int limit);

@@ -30,7 +30,7 @@ bool Join::handleException()
 
 bool Join::checkChMode(int chIdx)
 {
-	Channel curChannel = Database::getInstance()->getChannel(chIdx);
+	Channel& curChannel = Database::getInstance()->getChannel(chIdx);
 
 	if (curChannel.checkMode("k") && curChannel.getKey() != _parsedCommand[2])
 	{
@@ -68,8 +68,8 @@ void Join::execute()
 	if (DB->getAccount(_fd).isRoot() == false && checkChMode(chIdx))
 		return ;
 	DB->getChannel(chIdx).joinChannel(_fd, oper, ONLINE);
-	DB->getChannel(chIdx).announce(it->first, _parsedCommand[0], _parsedCommand[1]);
-	sendToClient(_fd, "332", _parsedCommand[1] + " :" +  _channels[chIdx].getTopic(), SERVER);
+	DB->getChannel(chIdx).announce(_parsedCommand[0], _parsedCommand[1]);
+	sendToClient(_fd, "332", _parsedCommand[1] + " :" + DB->getChannel(chIdx).getTopic(), SERVER);
 	std::string members = DB->getChannel(chIdx).generateFormattedMemberNames();
 	sendToClient(_fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
 	sendToClient(_fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);

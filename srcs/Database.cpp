@@ -56,7 +56,12 @@ int		Database::search(const std::string& target, int type)
 	return -1;
 }
 
-Channel&	getChannel(int idx)
+Channel& Database::getChannel(int idx)
 {
 	return _channels[idx];
+}
+
+void Database::deleteChannel(int idx)
+{
+	_channels.erase(_channels.begin() + idx);
 }

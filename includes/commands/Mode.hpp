@@ -5,7 +5,7 @@
 class Mode : public Command
 {
 	private:
-		bool exceptionMode();
+		bool handleException();
 		bool checkMode(const std::string& mode);
 		bool checkParams(const std::string& mode);
 
@@ -16,7 +16,7 @@ class Mode : public Command
 		bool changeModeL(Channel& channel, const int opCode, const std::string& param);
 		bool changeModeO(Channel& channel, const int opCode, const std::string& param);
 	public:
-		Mode(std::map<int, UserAccount>& clients, std::vector<Channel>& channels, uintptr_t fd, std::vector<std::string> parsedCommand);
+		Mode(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Mode();
 		void execute();
 };

@@ -37,6 +37,11 @@ const std::string &UserAccount::getServerName(void) const
 	return _serverName;
 }
 
+const std::vector<int>& UserAccount::getChannels(void) const
+{
+	return _channels;
+}
+
 bool UserAccount::isActive(void) const
 {
     return _active;
@@ -75,6 +80,11 @@ void UserAccount::setHostName(const std::string &hostName)
 void UserAccount::setServerName(const std::string &serverName)
 {
 	_serverName = serverName;
+}
+
+void UserAccount::addChannel(int idx)
+{
+	_channels.push_back(idx);
 }
 
 void UserAccount::activate(void)

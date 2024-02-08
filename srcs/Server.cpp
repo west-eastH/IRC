@@ -9,7 +9,7 @@
 #include "Oper.hpp"
 #include "Mode.hpp"
 #include "Ping.hpp"
-#include "WhoIs.hpp"
+// #include "WhoIs.hpp"
 #include "Privmsg.hpp"
 #include "Part.hpp"
 #include "Quit.hpp"
@@ -98,7 +98,7 @@ void Server::start(void)
                 else if (_DB->isUserExists(currEvent->ident) && cmds.empty())
                     cmds = parsingCommand(*currEvent);
             }
-            else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->_fd)
+            else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->getFd())
 			{
 				try
 				{
@@ -242,8 +242,6 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new User(fd, buff);
 	else if (buff.begin()->compare("PING") == 0)
 		cmd = new Ping(fd, buff);
-	else if (buff.begin()->compare("WHOIS") == 0)
-		cmd = new WhoIs(fd, buff);
 	else if (buff.begin()->compare("JOIN") == 0)
 		cmd = new Join(fd, buff);
 	else if (buff.begin()->compare("KICK") == 0)
@@ -262,6 +260,8 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Part(fd, buff);
 	else if (buff.begin()->compare("QUIT") == 0)
 		cmd = new Quit(fd, buff);
+	// else if (buff.begin()->compare("WHOIS") == 0)
+	// 	cmd = new WhoIs(fd, buff);
 	else
 		throw(1);
 	return cmd;

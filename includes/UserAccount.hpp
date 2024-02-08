@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <vector>
 
 class UserAccount{
 public:
@@ -31,12 +32,14 @@ public:
     const std::string &getUserName(void) const;
 	const std::string &getHostName(void) const;
 	const std::string &getServerName(void) const;
+	const std::vector<int>& getChannels(void) const;
 
     void setNickName(const std::string &nickName);
     void setRealName(const std::string &realName);
     void setUserName(const std::string &userName);
 	void setHostName(const std::string &hostName);
 	void setServerName(const std::string &hostName);
+	void addChannel(int idx);
 
     bool isActive(void) const;
 	bool isPass(void) const;
