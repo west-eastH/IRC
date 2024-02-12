@@ -68,7 +68,7 @@ void Join::execute()
 	if (DB->getAccount(_fd).isRoot() == false && checkChMode(chIdx))
 		return ;
 	DB->getChannel(chIdx).joinChannel(_fd, oper, ONLINE);
-	DB->getChannel(chIdx).announce(_parsedCommand[0], _parsedCommand[1]);
+	DB->getChannel(chIdx).announce(_fd, _parsedCommand[0], _parsedCommand[1], false);
 	sendToClient(_fd, "332", _parsedCommand[1] + " :" + DB->getChannel(chIdx).getTopic(), SERVER);
 	std::string members = DB->getChannel(chIdx).generateFormattedMemberNames();
 	sendToClient(_fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);

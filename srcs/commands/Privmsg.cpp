@@ -13,7 +13,7 @@ void Privmsg::execute()
 	{
 		int chIdx = findChannel(_parsedCommand[1]);
 		Channel& curChannel = Database::getInstance()->getChannel(chIdx);
-		curChannel.announce(_parsedCommand[0], " " + _parsedCommand[1] + " " + makeMessage(2));
+		curChannel.announce(_fd, _parsedCommand[0], " " + _parsedCommand[1] + " " + makeMessage(2), true);
 	}
 	else
 	{

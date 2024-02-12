@@ -42,7 +42,7 @@ void Part::execute()
 		return ;
 	chIdx = findChannel(_parsedCommand[1]);
 	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
-	curChannel.announce(_parsedCommand[0], " " + _parsedCommand[1]);
+	curChannel.announce(_fd, _parsedCommand[0], " " + _parsedCommand[1], false);
 	if (curChannel.partChannel(_fd) == 0)
 		Database::getInstance()->deleteChannel(chIdx);
 }

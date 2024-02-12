@@ -34,6 +34,7 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
 		prefix = sender.getServerName();
 		success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
 	}
+	std::cout << clientFd << " : " << success << std::endl;
     const char *msg = success.c_str();
 	int result = send(clientFd, msg, std::strlen(msg), 0);
     if (result == -1)

@@ -14,7 +14,7 @@ void Quit::execute()
 	for (size_t i = 0; i < currentChannelList.size(); i++)
 	{
 		Channel& channel = Database::getInstance()->getChannel(currentChannelList[i]);
-		channel.announce("PART", " " + channel.getName());
+		channel.announce(_fd, "PART", " " + channel.getName(), false);
 		if (channel.partChannel(_fd) == 0)
 			Database::getInstance()->deleteChannel(currentChannelList[i]);
 	}

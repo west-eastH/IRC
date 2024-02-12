@@ -40,6 +40,7 @@ public:
 	void setHostName(const std::string &hostName);
 	void setServerName(const std::string &hostName);
 	void addChannel(int idx);
+	void deleteChannel(int idx);
 
     bool isActive(void) const;
 	bool isPass(void) const;

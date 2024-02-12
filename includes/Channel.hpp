@@ -41,6 +41,6 @@ class Channel {
 		void	setTopic(const std::string topic);
 		void	setLimit(const int limit);
 		void	setKey(const std::string key);
-		void	announce(std::string cmd, std::string params);
+		void	announce(uintptr_t senderFd, std::string cmd, std::string params, bool flag);
 		const std::string generateFormattedMemberNames();
 };

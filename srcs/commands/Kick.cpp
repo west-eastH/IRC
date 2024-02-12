@@ -58,7 +58,7 @@ void Kick::execute()
 	targetFd = findNick(_parsedCommand[2]);
 	chIdx = findChannel(_parsedCommand[1]);
 	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
-	curChannel.announce(_parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() >= 4 ? makeMessage(3) : _parsedCommand[2]));
+	curChannel.announce(_fd, _parsedCommand[0], " " + _parsedCommand[1] + " " + _parsedCommand[2] + " " + (_parsedCommand.size() >= 4 ? makeMessage(3) : _parsedCommand[2]), false);
 	if (curChannel.partChannel(targetFd) == 0)
 		Database::getInstance()->deleteChannel(chIdx);
 }

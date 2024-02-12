@@ -71,5 +71,5 @@ void Topic::execute()
 		topic = topic.erase(pos, 1);
 	curChannel.setTopic(topic);
 	std::map<int, UserAccount*>::iterator it;
-	curChannel.announce(_parsedCommand[0], " " + _parsedCommand[1] + " :" + curChannel.getTopic());
+	curChannel.announce(_fd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + curChannel.getTopic(), false);
 }

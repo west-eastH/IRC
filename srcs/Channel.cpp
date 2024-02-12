@@ -64,6 +64,8 @@ void Channel::joinChannel(uintptr_t fd, bool oper, bool status)
 
 int	Channel::partChannel(int fd)
 {
+	Database* DB = Database::getInstance();
+	DB->getAccount(fd).deleteChannel(DB->search(_name, CHANNEL));
 	_members.erase(fd);
 	_userCount--;
 	return _userCount;
@@ -127,18 +129,20 @@ bool	Channel::isAdmin(uintptr_t fd)
 	return _members[fd].first;
 }
 
-void	Channel::announce(std::string cmd, std::string params)
+void	Channel::announce(uintptr_t senderFd, std::string cmd, std::string params, bool flag)
 {
 	std::string prefix;
 	std::string success;
 	std::map< uintptr_t, std::pair<bool, bool> >::iterator it;
 
+	UserAccount sender = Database::getInstance()->getAccount(senderFd);
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
-		UserAccount sender = Database::getInstance()->getAccount(it->first);
-
+		if (flag && senderFd == it->first)
+			continue;
 		prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
 		success = ":" + prefix + " " + cmd + " " + params + "\r\n";
+		std::cout << it->first << " : " << success << std::endl;
 		const char *msg = success.c_str();
 		int result = send(it->first, msg, std::strlen(msg), 0);
 		if (result == -1)

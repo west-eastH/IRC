@@ -87,6 +87,11 @@ void UserAccount::addChannel(int idx)
 	_channels.push_back(idx);
 }
 
+void UserAccount::deleteChannel(int idx)
+{
+	_channels.erase(_channels.begin() + idx);
+}
+
 void UserAccount::activate(void)
 {
 	_active = true;
