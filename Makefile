@@ -12,28 +12,36 @@ EOC         =   "\033[0;0m"
 LINE_CLEAR  =   "\x1b[1A\x1b[M"
 
 #-------------------------------------------
-NAME = a.out
+NAME = ircserv
 CXX	= c++
-CXXFLAGS = -Wall -Wextra -Werror -fsanitize=address -g3 -std=c++98
-SRCS =	main.cpp \
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+HEADER = ./includes
+HEADER_CMDS = ./includes/commands/
+
+SRCS_NAME =	main.cpp \
 		Server.cpp \
-		UserInfo.cpp \
-		Pass.cpp \
-		Command.cpp \
-		Channel.cpp \
-		Nick.cpp \
-		User.cpp \
-		Ping.cpp \
-		WhoIs.cpp \
-		Join.cpp \
-		Kick.cpp \
-		Invite.cpp \
-		Topic.cpp \
-		Privmsg.cpp \
-		Mode.cpp \
-		Oper.cpp \
-		Part.cpp \
-		Quit.cpp
+		UserAccount.cpp \
+		Database.cpp \
+		Channel.cpp 
+SRCS_PREFIX = ./srcs/
+SRCS = $(addprefix $(SRCS_PREFIX), $(SRCS_NAME))
+
+CMDS_NAME =	Pass.cpp \
+			Command.cpp \
+			Nick.cpp \
+			User.cpp \
+			Ping.cpp \
+			Join.cpp \
+			Kick.cpp \
+			Invite.cpp \
+			Topic.cpp \
+			Privmsg.cpp \
+			Mode.cpp \
+			Oper.cpp \
+			Part.cpp \
+			Quit.cpp 
+CMDS_PREFIX = ./srcs/commands/
+SRCS += $(addprefix $(CMDS_PREFIX), $(CMDS_NAME))
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -46,7 +54,7 @@ $(NAME) : $(OBJS)
 	@echo $(GREEN)"\n===================================================\n"$(EOC)
 
 %.o : %.cpp
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -c $< -o $@ -I$(HEADER) -I$(HEADER_CMDS)
 
 clean :
 	rm -f $(OBJS)
