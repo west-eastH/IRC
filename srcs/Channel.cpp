@@ -54,15 +54,18 @@ const std::string Channel::generateFormattedMemberNames()
 	return users;
 }
 
-void Channel::joinChannel(uintptr_t fd, bool oper, bool status)
+void Channel::join(uintptr_t fd, bool oper, bool status)
 {
 	_members[fd] = std::make_pair(oper, status);
-	Database* DB = Database::getInstance();
-	DB->getAccount(fd).addChannel(DB->search(_name, CHANNEL));
-	_userCount++;
+	if (status == true)
+	{
+		Database* DB = Database::getInstance();
+		DB->getAccount(fd).addChannel(DB->search(_name, CHANNEL));
+		_userCount++;
+	}
 }
 
-int	Channel::partChannel(int fd)
+int	Channel::part(int fd)
 {
 	Database* DB = Database::getInstance();
 	DB->getAccount(fd).deleteChannel(DB->search(_name, CHANNEL));
@@ -121,6 +124,11 @@ int	Channel::chopMember(const std::string& nick, bool op)
 
 bool	Channel::isMemberExists(uintptr_t fd) 
 {
+	return _members.find(fd) != _members.end();
+}
+
+bool	Channel::isInvitedMember(uintptr_t fd)
+{
 	return (_members.find(fd) != _members.end()) && _members[fd].second;
 }
 
@@ -131,21 +139,12 @@ bool	Channel::isAdmin(uintptr_t fd)
 
 void	Channel::announce(uintptr_t senderFd, std::string cmd, std::string params, bool flag)
 {
-	std::string prefix;
-	std::string success;
 	std::map< uintptr_t, std::pair<bool, bool> >::iterator it;
 
-	UserAccount sender = Database::getInstance()->getAccount(senderFd);
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
 		if (flag && senderFd == it->first)
 			continue;
-		prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
-		success = ":" + prefix + " " + cmd + " " + params + "\r\n";
-		std::cout << it->first << " : " << success << std::endl;
-		const char *msg = success.c_str();
-		int result = send(it->first, msg, std::strlen(msg), 0);
-		if (result == -1)
-			throw new std::runtime_error("Error: send failed");
+		Database::getInstance()->sendToClient(senderFd, it->first, cmd, " " + params, CLIENT);
 	}
 }

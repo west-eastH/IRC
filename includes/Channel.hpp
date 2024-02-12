@@ -31,12 +31,13 @@ class Channel {
 
 		int		getLimit() const;
 		int		getUserCount() const;
-		int		partChannel(int fd);
+		int		part(int fd);
 		int		chopMember(const std::string& nick, bool op);
 		bool	isMemberExists(uintptr_t fd);
+		bool	isInvitedMember(uintptr_t fd);
 		bool	isAdmin(uintptr_t fd);
 		bool	checkMode(const std::string& mode);
-		void	joinChannel(uintptr_t fd, bool oper, bool status);
+		void	join(uintptr_t fd, bool oper, bool status);
 		void	setMode(const std::string mode);
 		void	setTopic(const std::string topic);
 		void	setLimit(const int limit);

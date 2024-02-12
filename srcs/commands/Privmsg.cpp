@@ -18,7 +18,7 @@ void Privmsg::execute()
 	else
 	{
 		int targetFd = findNick(_parsedCommand[1]);
-		sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + makeMessage(2), CLIENT);
+		_DB->sendToClient(_fd, targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + makeMessage(2), CLIENT);
 	}
 }
 
@@ -27,17 +27,17 @@ bool Privmsg::handleException()
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	if (curUser.isPass() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() == 1)
 	{
-		sendToClient(_fd, "411", " :No recipient given (" + _parsedCommand[0] + ")", SERVER);
+		_DB->sendToClient(_fd, _fd, "411", " :No recipient given (" + _parsedCommand[0] + ")", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() == 2)
 	{
-		sendToClient(_fd, "412", " :No text to send", SERVER);
+		_DB->sendToClient(_fd, _fd, "412", " :No text to send", SERVER);
 		return true;
 	}
 	int targetFd;
@@ -45,13 +45,13 @@ bool Privmsg::handleException()
 											  Database::getInstance()->getAccount(targetFd).isActive()) == false) ||
 		(_parsedCommand[1].front() == '#' && findChannel(_parsedCommand[1]) == -1))
 	{
-		sendToClient(_fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
+		_DB->sendToClient(_fd, _fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
 		return true;
 	}
 	Channel& curChannel = Database::getInstance()->getChannel(findChannel(_parsedCommand[1]));
 	if (_parsedCommand[1].front() == '#' && curChannel.isMemberExists(_fd) == false)
 	{
-		sendToClient(_fd, "404", _parsedCommand[1] + " :Cannot send to channel", SERVER);
+		_DB->sendToClient(_fd, _fd, "404", _parsedCommand[1] + " :Cannot send to channel", SERVER);
 		return true;
 	}
 	return false;

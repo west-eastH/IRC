@@ -3,8 +3,12 @@
 #include "UserAccount.hpp"
 #include "Channel.hpp"
 
-#define NICK 0
-#define CHANNEL 1
+#define NICK	0
+#define CHANNEL	1
+
+#define CLIENT 0
+#define SERVER 1
+
 
 class Database
 {
@@ -27,4 +31,5 @@ public:
 	void		deleteChannel(int idx);
 
 	int		search(const std::string& target, int type);
+	void 	sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag);
 };

@@ -15,7 +15,7 @@ void Quit::execute()
 	{
 		Channel& channel = Database::getInstance()->getChannel(currentChannelList[i]);
 		channel.announce(_fd, "PART", " " + channel.getName(), false);
-		if (channel.partChannel(_fd) == 0)
+		if (channel.part(_fd) == 0)
 			Database::getInstance()->deleteChannel(currentChannelList[i]);
 	}
 	close(_fd);
@@ -27,7 +27,7 @@ bool Quit::handleException()
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	if (curUser.isPass() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	return false;

@@ -10,45 +10,50 @@ void Invite::execute()
 	int chIdx = -1;
 	int targetFd;
 	std::string msg;
-	Database *DB = Database::getInstance();
 
 	if (handleException())
 		return ;
 	targetFd = findNick(_parsedCommand[1]);
 	chIdx = findChannel(_parsedCommand[2]);
-	DB->getChannel(chIdx).joinChannel(_fd, MEMBER, OFFLINE);
-	sendToClient(_fd, "341", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
-	sendToClient(targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + _parsedCommand[2], CLIENT);
+	_DB->getChannel(chIdx).join(targetFd, MEMBER, OFFLINE);
+	_DB->sendToClient(_fd, _fd, "341", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
+	_DB->sendToClient(_fd, targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + _parsedCommand[2], CLIENT);
+
+// 	127.000.000.001.58206-127.000.000.001.06667: INVITE phan #new
+
+// 127.000.000.001.06667-127.000.000.001.58206: :irc.local 341 nickname phan :#new
+
+// 127.000.000.001.06667-127.000.000.001.38766: :nickname!codespace@127.0.0.1 INVITE phan :#new
 }
 bool Invite::handleException()
 {
 	int targetFd;
-
-	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	
+	UserAccount& curUser = _DB->getAccount(_fd);
 	if (curUser.isActive() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;		
 	}
 	if (_parsedCommand.size() != 3)
 	{
-		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+		_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
-	Channel& curChannel = Database::getInstance()->getChannel(findChannel(_parsedCommand[2]));
+	if ((findChannel(_parsedCommand[2]) == -1) || (targetFd = findNick(_parsedCommand[1])) == -1 || Database::getInstance()->getAccount(targetFd).isActive() == false)
+	{
+		_DB->sendToClient(_fd, _fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
+		return true;
+	}
+	Channel& curChannel = _DB->getChannel(findChannel(_parsedCommand[2]));
 	if (curChannel.isMemberExists(_fd) == false || curChannel.isAdmin(_fd) == false)
 	{
-		sendToClient(_fd, "482", _parsedCommand[2] + " :You're not channel operator", SERVER);
-		return true;
-	}
-	if ((targetFd = findNick(_parsedCommand[1])) == -1 || Database::getInstance()->getAccount(targetFd).isActive() == false)
-	{
-		sendToClient(_fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
+		_DB->sendToClient(_fd, _fd, "482", _parsedCommand[2] + " :You're not channel operator", SERVER);
 		return true;
 	}
 	if (curChannel.isMemberExists(targetFd) == true)
 	{
-		sendToClient(_fd, "443", _parsedCommand[1] + " " + _parsedCommand[2] + " :is already on channel", SERVER);
+		_DB->sendToClient(_fd, _fd, "443", _parsedCommand[1] + " " + _parsedCommand[2] + " :is already on channel", SERVER);
 		return true;	
 	}
 	return false;

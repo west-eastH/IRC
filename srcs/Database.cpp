@@ -56,6 +56,29 @@ int		Database::search(const std::string& target, int type)
 	return -1;
 }
 
+void Database::sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag)
+{
+	std::string prefix;
+	std::string success;
+	UserAccount sender = getAccount(senderFd);
+
+	if (flag == CLIENT)
+	{
+		prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
+		success = ":" + prefix + " " + cmd + params + "\r\n";
+	}
+	else
+	{
+		prefix = sender.getServerName();
+		success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
+	}
+	std::cout << targetFd << " : " << success << std::endl;
+    const char *msg = success.c_str();
+	int result = send(targetFd, msg, std::strlen(msg), 0);
+    if (result == -1)
+        throw new std::runtime_error("Error: send failed");
+}
+
 Channel& Database::getChannel(int idx)
 {
 	return _channels[idx];

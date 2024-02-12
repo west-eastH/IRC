@@ -10,18 +10,18 @@ bool Topic::handleException()
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	if (curUser.isActive() == false)
 	{
-		sendToClient(_fd, "", "You need to login first", SERVER);
+		_DB->sendToClient(_fd, _fd, "", "You need to login first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
 	{
-		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+		_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	Channel& curChannel = Database::getInstance()->getChannel(findChannel(_parsedCommand[1]));
-	if (curChannel.isMemberExists(_fd))
+	if (curChannel.isMemberExists(_fd) == false)
 	{
-		sendToClient(_fd, "442", _parsedCommand[1] + " :You're not on that channel" , SERVER);
+		_DB->sendToClient(_fd, _fd, "442", _parsedCommand[1] + " :You're not on that channel" , SERVER);
 		return true;
 	}
 	return false;
@@ -32,9 +32,9 @@ bool Topic::printTopic(int chIdx)
 	if (_parsedCommand.size() == 2)
 	{
 		if (curChannel.getTopic().length() == 0)
-			sendToClient(_fd, "331", _parsedCommand[1] + " :No topic is set", SERVER);
+			_DB->sendToClient(_fd, _fd, "331", _parsedCommand[1] + " :No topic is set", SERVER);
 		else
-			sendToClient(_fd, "332", _parsedCommand[1] + " :" +  curChannel.getTopic(), SERVER);
+			_DB->sendToClient(_fd, _fd, "332", _parsedCommand[1] + " :" +  curChannel.getTopic(), SERVER);
 		return true;
 	}
 	return false;
@@ -45,7 +45,7 @@ bool Topic::checkAuth(int chIdx)
 	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
 	if (curChannel.checkMode("t") && curChannel.isAdmin(_fd) == false)
 	{
-		sendToClient( _fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
+		_DB->sendToClient(_fd, _fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
 		return true;
 	}
 	return false;

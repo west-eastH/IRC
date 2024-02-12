@@ -11,7 +11,7 @@ void Oper::execute()
 		return ;
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	curUser.authorize();
-	sendToClient(_fd, "381", " :You are now an IRC operator", SERVER);
+	_DB->sendToClient(_fd, _fd, "381", " :You are now an IRC operator", SERVER);
 }
 
 bool Oper::handleException()
@@ -19,22 +19,22 @@ bool Oper::handleException()
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	if (curUser.isActive() == false)
 	{
-		sendToClient(_fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	if (_parsedCommand.size() != 3)
 	{
-		sendToClient(_fd, "461", " :Not enough parameters", SERVER);
+		_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
 		return true;
 	}
 	if (_parsedCommand[1] != _rootId || _parsedCommand[2] != _rootPw)
 	{
-		sendToClient(_fd, "464", " :Password incorrect", SERVER);
+		_DB->sendToClient(_fd, _fd, "464", " :Password incorrect", SERVER);
 		return true;
 	}
 	if (curUser.isRoot())
 	{
-		sendToClient(_fd, "", " You are already root!", SERVER);
+		_DB->sendToClient(_fd, _fd, "", " You are already root!", SERVER);
 		return true;
 	}
 	return false;

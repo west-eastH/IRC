@@ -2,22 +2,20 @@
 #include "Command.hpp"
 
 Command::Command(uintptr_t fd, std::vector<std::string> parsedCommand) 
-	:_fd(fd), _parsedCommand(parsedCommand) {}
+	:_fd(fd), _DB(Database::getInstance()), _parsedCommand(parsedCommand) {}
 
 Command::~Command() {}
 
 int Command::findNick(const std::string& nick) const
 {
-	Database* DB = Database::getInstance();
-	return DB->search(nick, NICK);
+	return _DB->search(nick, NICK);
 }
 
 int	Command::findChannel(const std::string& name) const
 {
-	Database* DB = Database::getInstance();
-	return DB->search(name, CHANNEL);
+	return _DB->search(name, CHANNEL);
 }
-
+/* 
 void Command::sendToClient(int clientFd, std::string cmd, std::string params, bool flag)
 {
 	std::string prefix;
@@ -40,7 +38,7 @@ void Command::sendToClient(int clientFd, std::string cmd, std::string params, bo
     if (result == -1)
         throw new std::runtime_error("Error: send failed");
 }
-
+ */
 bool Command::isPrintable(const std::string& str)
 {
 	for (size_t i = 0; i < str.length(); i++)
