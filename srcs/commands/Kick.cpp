@@ -7,19 +7,18 @@ Kick::~Kick() {}
 
 bool Kick::handleException()
 {
-		UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 
 	if (curUser.isActive() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
-	if (_parsedCommand.size() < 3 || _parsedCommand.size() > 4)
+	if (_parsedCommand.size() < 3)
 	{
 		_DB->sendToClient(_fd, _fd, "431", " :No nickname given", SERVER);
 		return true;
 	}
-
 	int channelIdx = findChannel(_parsedCommand[1]);
 	if (channelIdx == -1)
 	{

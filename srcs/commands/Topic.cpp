@@ -8,14 +8,20 @@ Topic::~Topic() {}
 bool Topic::handleException()
 {
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+
 	if (curUser.isActive() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", "You need to login first", SERVER);
 		return true;
 	}
-	if (_parsedCommand.size() < 2 || _parsedCommand.size() > 3)
+	if (_parsedCommand.size() < 2)
 	{
 		_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
+		return true;
+	}
+	if (findChannel(_parsedCommand[1]) == -1)
+	{
+		_DB->sendToClient(_fd, _fd, "403", _parsedCommand[1] + " :No such Channel", SERVER);
 		return true;
 	}
 	Channel& curChannel = Database::getInstance()->getChannel(findChannel(_parsedCommand[1]));
@@ -29,6 +35,7 @@ bool Topic::handleException()
 bool Topic::printTopic(int chIdx)
 {
 	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
+
 	if (_parsedCommand.size() == 2)
 	{
 		if (curChannel.getTopic().length() == 0)
@@ -43,6 +50,7 @@ bool Topic::printTopic(int chIdx)
 bool Topic::checkAuth(int chIdx)
 {
 	Channel &curChannel = Database::getInstance()->getChannel(chIdx);
+
 	if (curChannel.checkMode("t") && curChannel.isAdmin(_fd) == false)
 	{
 		_DB->sendToClient(_fd, _fd, "482", _parsedCommand[1] + " :You're not channel operator", SERVER);
@@ -70,6 +78,5 @@ void Topic::execute()
 	if (pos != std::string::npos)
 		topic = topic.erase(pos, 1);
 	curChannel.setTopic(topic);
-	std::map<int, UserAccount*>::iterator it;
 	curChannel.announce(_fd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + curChannel.getTopic(), false);
 }

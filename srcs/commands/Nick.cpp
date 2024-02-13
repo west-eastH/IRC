@@ -7,7 +7,6 @@ Nick::~Nick() {}
 
 bool Nick::handleException()
 {
-	
 	if (_DB->getAccount(_fd).isPass() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
@@ -33,7 +32,6 @@ bool Nick::handleException()
 
 void Nick::execute()
 {
-	
 	if (handleException())
 		return ;
 	_DB->sendToClient(_fd, _fd, _parsedCommand[0], " :" + _parsedCommand[1], CLIENT);

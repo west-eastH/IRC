@@ -30,6 +30,8 @@ void Privmsg::execute()
 bool Privmsg::handleException()
 {
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+	int targetFd;
+
 	if (curUser.isPass() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
@@ -45,7 +47,6 @@ bool Privmsg::handleException()
 		_DB->sendToClient(_fd, _fd, "412", " :No text to send", SERVER);
 		return true;
 	}
-	int targetFd;
 	if ((_parsedCommand[1].front() != '#' && ((targetFd = findNick(_parsedCommand[1])) == -1 ||
 											  Database::getInstance()->getAccount(targetFd).isActive()) == false) ||
 		(_parsedCommand[1].front() == '#' && findChannel(_parsedCommand[1]) == -1))

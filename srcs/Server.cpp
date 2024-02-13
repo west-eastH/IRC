@@ -93,10 +93,18 @@ void Server::start(void)
             }
             else if (currEvent->filter == EVFILT_READ)
             {
-                if (currEvent->ident == _socketFd)
-                    connectClient(changeList);
-                else if (_DB->isUserExists(currEvent->ident) && cmds.empty())
-                    cmds = parsingCommand(*currEvent);
+				try
+				{
+					if (currEvent->ident == _socketFd)
+						connectClient(changeList);
+					else if (_DB->isUserExists(currEvent->ident) && cmds.empty())
+						cmds = parsingCommand(*currEvent);
+				}
+				catch(const std::exception& e)
+				{
+					std::cerr << e.what() << '\n';
+				}
+				
             }
             else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->getFd())
 			{
@@ -260,14 +268,7 @@ Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 		cmd = new Part(fd, buff);
 	else if (buff.begin()->compare("QUIT") == 0)
 		cmd = new Quit(fd, buff);
-	// else if (buff.begin()->compare("WHOIS") == 0)
-	// 	cmd = new WhoIs(fd, buff);
 	else
 		throw(1);
 	return cmd;
 }
-
-//NICK phan
-//USER phan phan 0 :pilho
-//WHOIS phan
-//PING irc.libera.chat

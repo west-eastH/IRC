@@ -68,6 +68,7 @@ void Channel::join(uintptr_t fd, bool oper, bool status)
 int	Channel::part(int fd)
 {
 	Database* DB = Database::getInstance();
+
 	DB->getAccount(fd).deleteChannel(DB->search(_name, CHANNEL));
 	_members.erase(fd);
 	_userCount--;
@@ -98,7 +99,7 @@ void Channel::setLimit(const int limit)
 
 void Channel::setKey(const std::string key)
 {
-		_key = key;
+	_key = key;
 }
 
 const std::string& Channel::getTopic() const
@@ -109,6 +110,7 @@ const std::string& Channel::getTopic() const
 int	Channel::chopMember(const std::string& nick, bool op) 
 {
 	std::map< uintptr_t, std::pair<bool, bool> >::iterator it;
+
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
 		if (Database::getInstance()->getAccount(it->first).getNickName() == nick)

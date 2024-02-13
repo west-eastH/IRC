@@ -15,30 +15,7 @@ int	Command::findChannel(const std::string& name) const
 {
 	return _DB->search(name, CHANNEL);
 }
-/* 
-void Command::sendToClient(int clientFd, std::string cmd, std::string params, bool flag)
-{
-	std::string prefix;
-	std::string success;
-	UserAccount sender = Database::getInstance()->getAccount(clientFd);
 
-	if (flag == CLIENT)
-	{
-		prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
-		success = ":" + prefix + " " + cmd + params + "\r\n";
-	}
-	else
-	{
-		prefix = sender.getServerName();
-		success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
-	}
-	std::cout << clientFd << " : " << success << std::endl;
-    const char *msg = success.c_str();
-	int result = send(clientFd, msg, std::strlen(msg), 0);
-    if (result == -1)
-        throw new std::runtime_error("Error: send failed");
-}
- */
 bool Command::isPrintable(const std::string& str)
 {
 	for (size_t i = 0; i < str.length(); i++)

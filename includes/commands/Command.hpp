@@ -15,7 +15,6 @@ class Command
 		uintptr_t	getFd() const;
 		int findNick(const std::string& nick) const;
 		int	findChannel(const std::string& name) const;
-		// void sendToClient(int clientFd, std::string cmd, std::string params, bool flag);
 		bool isPrintable(const std::string& str);
 		virtual void execute() = 0;
 		std::string makeMessage(size_t idx);

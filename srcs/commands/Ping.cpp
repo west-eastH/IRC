@@ -14,8 +14,8 @@ void Ping::execute()
 
 bool Ping::handleException()
 {
-	
 	struct hostent *host_info;
+
 	if (_parsedCommand.size() != 2)
 	{
 		_DB->sendToClient(_fd, _fd, "409", _parsedCommand[0] + " :No origin specified", SERVER);
@@ -32,10 +32,9 @@ bool Ping::handleException()
 
 void Ping::pong()
 {
-	
 	std::string result = "PONG " + _DB->getAccount(_fd).getServerName() + "\r\n";
-	 int n = send(_fd, result.c_str(), result.length(), 0);
-	 std::cout << result << std::endl;
+	int n = send(_fd, result.c_str(), result.length(), 0);
+
     if (n == -1)
         throw new std::runtime_error("Error: send failed");
 }

@@ -24,8 +24,6 @@ public:
     virtual ~UserAccount();
 
     std::string sendBuffer;
-    //std::map<std::string, bool> channels;
-
 
     const std::string &getNickName(void) const;
     const std::string &getRealName(void) const;
@@ -45,7 +43,7 @@ public:
     bool isActive(void) const;
 	bool isPass(void) const;
 	bool isRoot(void) const;
-	bool isInChannel(int idx); //TODO
+	bool isInChannel(int idx);
 
 	void activate(void);
 	void deactivate(void);

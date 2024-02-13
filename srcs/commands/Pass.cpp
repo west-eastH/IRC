@@ -7,7 +7,6 @@ Pass::~Pass() {}
 
 void Pass::execute()
 {
-	
 	if (handleException())
 		return ;
 	if (_parsedCommand[1] != _password)
@@ -18,7 +17,6 @@ void Pass::execute()
 
 bool Pass::handleException()
 {
-	
 	if (_DB->getAccount(_fd).isActive() == true)
 	{
 		_DB->sendToClient(_fd, _fd, "462", " :Unauthorized command (already registered)", SERVER);

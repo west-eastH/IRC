@@ -6,7 +6,7 @@ class Mode : public Command
 {
 	private:
 		bool handleException();
-		bool checkMode(const std::string& mode);
+		bool checkMode(std::string& mode);
 		bool checkParams(const std::string& mode);
 
 		void chmod(Channel& channel, const std::string& mode);

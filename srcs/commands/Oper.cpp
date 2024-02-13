@@ -10,6 +10,7 @@ void Oper::execute()
 	if (handleException())
 		return ;
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+
 	curUser.authorize();
 	_DB->sendToClient(_fd, _fd, "381", " :You are now an IRC operator", SERVER);
 }
@@ -17,6 +18,7 @@ void Oper::execute()
 bool Oper::handleException()
 {
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
+
 	if (curUser.isActive() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);

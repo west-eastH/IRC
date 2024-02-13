@@ -18,18 +18,13 @@ void Invite::execute()
 	_DB->getChannel(chIdx).join(targetFd, MEMBER, OFFLINE);
 	_DB->sendToClient(_fd, _fd, "341", _parsedCommand[1] + " " + _parsedCommand[2], SERVER);
 	_DB->sendToClient(_fd, targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " :" + _parsedCommand[2], CLIENT);
-
-// 	127.000.000.001.58206-127.000.000.001.06667: INVITE phan #new
-
-// 127.000.000.001.06667-127.000.000.001.58206: :irc.local 341 nickname phan :#new
-
-// 127.000.000.001.06667-127.000.000.001.38766: :nickname!codespace@127.0.0.1 INVITE phan :#new
 }
+
 bool Invite::handleException()
 {
 	int targetFd;
-	
 	UserAccount& curUser = _DB->getAccount(_fd);
+
 	if (curUser.isActive() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);

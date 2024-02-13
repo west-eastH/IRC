@@ -7,7 +7,6 @@ Join::~Join() {}
 
 bool Join::handleException()
 {
-	
 	if (_DB->getAccount(_fd).isActive() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
@@ -52,13 +51,18 @@ bool Join::checkChMode(int chIdx)
 void Join::execute()
 {
 	int chIdx = -1;
-		bool oper = _DB->getAccount(_fd).isRoot() ? OPER : MEMBER;
+	bool oper = _DB->getAccount(_fd).isRoot() ? OPER : MEMBER;
 
 	if (handleException())
 		return ;
 	if (findChannel(_parsedCommand[1]) == -1)
 	{
 		const std::string key = _parsedCommand.size() == 2 ? "" : _parsedCommand[2];
+		if (isPrintable(_parsedCommand[1]) == false || _parsedCommand[1].length() > 50)
+		{
+			_DB->sendToClient(_fd, _fd, "432", _parsedCommand[1] + " :Erroneous channel name", SERVER);
+			return ;
+		}
 		_DB->addChannel(_parsedCommand[1], key);
 		oper = true;
 	}

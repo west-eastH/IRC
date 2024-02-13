@@ -3,10 +3,10 @@
 
 int main(int ac, char *av[])
 {
+	if (ac != 3)
+		throw std::invalid_argument("Invalid argument!");
 	try
 	{
-		if (ac != 3)
-			throw std::invalid_argument("Invalid argument!");
 		Server server(av[1], av[2]);
 		server.start();
 	}
@@ -14,6 +14,5 @@ int main(int ac, char *av[])
 	{
 		std::cerr << e.what() << '\n';
 	}
-	
 	return 0;
 }

@@ -7,7 +7,6 @@ User::~User() {}
 
 bool User::handleException()
 {
-	
 	if (_DB->getAccount(_fd).isPass() == false)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
@@ -33,7 +32,6 @@ bool User::handleException()
 
 void User::execute()
 {
-	
 	if (handleException())
 		return ;
 	_DB->getAccount(_fd).setUserName(_parsedCommand[1]);
@@ -56,6 +54,5 @@ std::string User::makeRealname()
 		realname += _parsedCommand[i] + " ";
 	realname.erase(std::find(realname.begin(), realname.end(), ':'));
 	realname.erase(realname.find_last_not_of(" ") + 1);
-
 	return realname;
 }

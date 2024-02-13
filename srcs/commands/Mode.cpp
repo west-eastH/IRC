@@ -7,7 +7,6 @@ Mode::~Mode() {}
 
 bool Mode::handleException()
 {
-	
 	if (_DB->getAccount(_fd).isActive() != true)
 	{
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :Activate first!", SERVER);
@@ -47,9 +46,11 @@ void Mode::execute()
 	chmod(curChannel, _parsedCommand[2]);
 }
 
-bool Mode::checkMode(const std::string& mode)
+bool Mode::checkMode(std::string& mode)
 {
 	const std::string modeList = "itklo+-";
+	std::string myMode;
+	std::string opCode = "+";
 
 	for (size_t i = 0; i < mode.length(); i++)
 	{
@@ -60,6 +61,14 @@ bool Mode::checkMode(const std::string& mode)
 			return false;
 		}
 	}
+	for (size_t i = 0; i < mode.length(); i++)
+	{
+		if (mode[i] == '+' || mode[i] == '-')
+			opCode = mode[i];
+		else
+			myMode += opCode + mode[i];
+	}
+	mode = myMode;
 	return true;
 }
 
@@ -134,6 +143,7 @@ bool Mode::changeModeI(Channel& channel, const int opCode, const std::string& pa
 bool Mode::changeModeT(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('t');
+
 	(void) param;
 	if (opCode == '+')
 	{
@@ -157,6 +167,7 @@ bool Mode::changeModeT(Channel& channel, const int opCode, const std::string& pa
 bool Mode::changeModeK(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('k');
+
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
@@ -184,6 +195,7 @@ bool Mode::changeModeK(Channel& channel, const int opCode, const std::string& pa
 bool Mode::changeModeL(Channel& channel, const int opCode, const std::string& param)
 {
 	size_t pos = channel.getMode().find('l');
+
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
@@ -214,6 +226,7 @@ bool Mode::changeModeO(Channel& channel, const int opCode, const std::string& pa
 {
 	bool modeO = opCode == '+' ? true : false;
 	int res = channel.chopMember(param, modeO);
+
 	if (res < 0)
 	{
 		_DB->sendToClient(_fd, _fd, "441", param + " " + _parsedCommand[1] + " :They aren't on that channel", SERVER);

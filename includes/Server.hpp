@@ -36,7 +36,6 @@ class Server{
 
 		void		connectClient(std::vector<struct kevent>& changeList);
         void		disconnectClient(int clientFd);
-		//void		splitBuff(uintptr_t fd, std::vector<std::string>& buff);
 		std::vector<std::string> splitBuff(std::string& sendBuffer);
 		Command*	createCommand(uintptr_t fd, std::vector<std::string>& buff);
         std::vector<Command*> parsingCommand(struct kevent& currEvent);
@@ -47,7 +46,4 @@ class Server{
         ~Server();
 
         void	start(void);
-
-        //std::map<int, UserAccount>	clients;
-		//std::vector<Channel>	channels;
 };

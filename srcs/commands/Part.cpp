@@ -8,6 +8,7 @@ Part::~Part() {}
 bool Part::handleException()
 {
 	int channelIdx = findChannel(_parsedCommand[1]);
+
 	if (channelIdx == -1)
 	{
 		_DB->sendToClient(_fd, _fd, "403", _parsedCommand[1] + " :No such Channel", SERVER);
