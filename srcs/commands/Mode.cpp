@@ -124,7 +124,7 @@ bool Mode::changeModeI(Channel& channel, const int opCode, const std::string& pa
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
-			return false;
+			return true;
 		std::string currMode = channel.getMode();
 		currMode += "i";
 		channel.setMode(currMode);
@@ -132,7 +132,7 @@ bool Mode::changeModeI(Channel& channel, const int opCode, const std::string& pa
 	else
 	{
 		if (pos == std::string::npos)
-			return false;
+			return true;
 		std::string currMode = channel.getMode();
 		currMode.erase(pos, 1);
 		channel.setMode(currMode);
@@ -148,7 +148,7 @@ bool Mode::changeModeT(Channel& channel, const int opCode, const std::string& pa
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
-			return false;
+			return true;
 		std::string currMode = channel.getMode();
 		currMode += "t";
 		channel.setMode(currMode);
@@ -156,7 +156,7 @@ bool Mode::changeModeT(Channel& channel, const int opCode, const std::string& pa
 	else
 	{
 		if (pos == std::string::npos)
-			return false;
+			return true;
 		std::string currMode = channel.getMode();
 		currMode.erase(pos, 1);
 		channel.setMode(currMode);
@@ -199,7 +199,7 @@ bool Mode::changeModeL(Channel& channel, const int opCode, const std::string& pa
 	if (opCode == '+')
 	{
 		if (pos != std::string::npos)
-			return false;
+			return true;
 		for (size_t i = 0; i < param.length(); i++)
 			if (std::isdigit(param[i]) == 0)
 				return false;
@@ -214,7 +214,7 @@ bool Mode::changeModeL(Channel& channel, const int opCode, const std::string& pa
 	else
 	{
 		if (pos == std::string::npos)
-			return false;
+			return true;
 		std::string currMode = channel.getMode();
 		currMode.erase(pos, 1);
 		channel.setMode(currMode);
