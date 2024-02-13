@@ -18,6 +18,11 @@ void Privmsg::execute()
 	else
 	{
 		int targetFd = findNick(_parsedCommand[1]);
+		if (targetFd == -1)
+		{
+			_DB->sendToClient(_fd, _fd, "401", _parsedCommand[1] + " :No such nick/channel", SERVER);
+			return ;
+		}
 		_DB->sendToClient(_fd, targetFd, _parsedCommand[0], " " + _parsedCommand[1] + " " + makeMessage(2), CLIENT);
 	}
 }
