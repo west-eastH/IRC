@@ -17,8 +17,14 @@ bool Mode::handleException()
 		if (_parsedCommand.size() != 2)
 			_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
 		else
-		{
-			Channel& curChannel = _DB->getChannel(_DB->search(_parsedCommand[1], CHANNEL));
+		{	
+			int chIdx = _DB->search(_parsedCommand[1], CHANNEL);
+			if (chIdx == -1)
+			{
+				_DB->sendToClient(_fd, _fd, "403", _parsedCommand[1] + " :No such Channel", SERVER);
+				return true;
+			}
+			Channel& curChannel = _DB->getChannel(chIdx);
 			_DB->sendToClient(_fd, _fd, "324", _parsedCommand[1] + " :" + curChannel.getMode(), SERVER);
 		}
 		return true;

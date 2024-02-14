@@ -50,8 +50,10 @@ int		Database::search(const std::string& target, int type)
 	else if (type == CHANNEL)
 	{
 		for (size_t i = 0; i < _channels.size(); i++)
+		{
 			if (_channels[i].getName() == target)
 				return i;
+		}
 	}
 	return -1;
 }

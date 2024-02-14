@@ -68,7 +68,6 @@ void Channel::join(uintptr_t fd, bool oper, bool status)
 int	Channel::part(int fd)
 {
 	Database* DB = Database::getInstance();
-
 	DB->getAccount(fd).deleteChannel(DB->search(_name, CHANNEL));
 	_members.erase(fd);
 	_userCount--;
