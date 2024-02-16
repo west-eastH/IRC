@@ -10,5 +10,5 @@ class Join : public Command
 	public:
 		Join(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Join();
-		void execute();
+		virtual void execute();
 };

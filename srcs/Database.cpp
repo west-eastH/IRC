@@ -52,7 +52,10 @@ int		Database::search(const std::string& target, int type)
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
 			if (_channels[i].getName() == target)
+			{
+				std::cout << "idx : " << i << std::endl;
 				return i;
+			}
 		}
 	}
 	return -1;
@@ -74,7 +77,6 @@ void Database::sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string 
 		prefix = sender.getServerName();
 		success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
 	}
-	std::cout << targetFd << " : " << success << std::endl;
     const char *msg = success.c_str();
 	int result = send(targetFd, msg, std::strlen(msg), 0);
     if (result == -1)
@@ -88,5 +90,7 @@ Channel& Database::getChannel(int idx)
 
 void Database::deleteChannel(int idx)
 {
+	if (idx == -1)
+		return ;
 	_channels.erase(_channels.begin() + idx);
 }

@@ -9,5 +9,5 @@ class Kick : public Command
 	public:
 		Kick(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Kick();
-		void execute();
+		virtual void execute();
 };

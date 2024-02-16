@@ -9,7 +9,6 @@
 #include "Oper.hpp"
 #include "Mode.hpp"
 #include "Ping.hpp"
-// #include "WhoIs.hpp"
 #include "Privmsg.hpp"
 #include "Part.hpp"
 #include "Quit.hpp"
@@ -104,7 +103,6 @@ void Server::start(void)
 				{
 					std::cerr << e.what() << '\n';
 				}
-				
             }
             else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->getFd())
 			{
@@ -124,11 +122,9 @@ void Server::start(void)
 				cmds.clear();
 				if (_DB->isUserExists(currEvent->ident) == false)
 					continue ;
-				//clients[currEvent->ident].sendBuffer.clear();
 				_DB->getAccount(currEvent->ident).sendBuffer.clear();
 			}
-        }
-        
+        }  
     }
 }
 
@@ -141,7 +137,6 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
 
     changeEvents(changeList, clientSocket, EVFILT_READ);
     changeEvents(changeList, clientSocket, EVFILT_WRITE);
-    //clients[clientSocket].sendBuffer.clear();//
 	_DB->addAccount(clientSocket);
 }
 
@@ -165,7 +160,6 @@ std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 			return cmds;
 		}
 		buf[n] = '\0';
-		//clients[currEvent.ident].sendBuffer += buf;//
 		sendBuffer += buf;
 		if (std::strlen(buf) < 511)
 			break ;
@@ -196,7 +190,6 @@ void Server::disconnectClient(int clientFd)
 {
     std::cout << clientFd << " : disconnect client" << std::endl;
     close(clientFd);
-    //clients.erase(clientFd);//
 	_DB->deleteAccount(clientFd);
 }
 
@@ -222,7 +215,6 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 {
 	size_t pos = st.find(" ");
 	std::vector<std::string> vec;
-	std::cout << st << std::endl;
 	while (pos != std::string::npos)
 	{
 		std::string cmdTemp;
@@ -240,7 +232,6 @@ std::vector<std::string> Server::splitSpace(std::string& st)
 Command* Server::createCommand(uintptr_t fd, std::vector<std::string>& buff)
 {
 	Command*	cmd	= NULL;
-
 
 	if (buff.begin()->compare("PASS") == 0)
 		cmd = new Pass(fd, buff, _password);

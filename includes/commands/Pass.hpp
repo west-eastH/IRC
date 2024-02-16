@@ -10,5 +10,5 @@ class Pass : public Command
 	public:
 		Pass(uintptr_t fd, std::vector<std::string> parsedCommand, std::string password);
 		~Pass();
-		void	execute();
+		virtual void execute();
 };

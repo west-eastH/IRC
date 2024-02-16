@@ -32,6 +32,7 @@ bool Topic::handleException()
 	}
 	return false;
 }
+
 bool Topic::printTopic(int chIdx)
 {
 	Channel &curChannel = Database::getInstance()->getChannel(chIdx);

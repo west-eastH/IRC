@@ -10,6 +10,5 @@ class Privmsg : public Command
 	public:
 		Privmsg(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Privmsg();
-
 		virtual void execute();
 };

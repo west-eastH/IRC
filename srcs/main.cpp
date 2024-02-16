@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "Database.hpp"
 
 int main(int ac, char *av[])
 {

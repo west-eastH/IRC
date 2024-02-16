@@ -5,11 +5,11 @@
 class User : public Command
 {
 	private:
-		bool handleException();
+		bool 		handleException();
 		std::string makeRealname();
 	public:
 		User(uintptr_t fd, std::vector<std::string> temp_split);
 		~User();
 
-		void execute();
+		virtual void execute();
 };

@@ -61,7 +61,9 @@ void Channel::join(uintptr_t fd, bool oper, bool status)
 	{
 		Database* DB = Database::getInstance();
 		DB->getAccount(fd).addChannel(DB->search(_name, CHANNEL));
-		_userCount++;
+		// _userCount++;
+		_userCount = _members.size();
+		std::cout << "usercount : " << _userCount << std::endl;
 	}
 }
 

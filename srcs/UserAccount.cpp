@@ -89,7 +89,10 @@ void UserAccount::addChannel(int idx)
 
 void UserAccount::deleteChannel(int idx)
 {
-	_channels.erase(std::find(_channels.begin(), _channels.end(), idx));
+	if (idx == -1)
+		return ;
+	_channels.erase(_channels.begin() +  idx);
+	// _channels.erase(std::find(_channels.begin(), _channels.end(), idx));
 }
 
 void UserAccount::activate(void)

@@ -28,7 +28,9 @@ bool Quit::handleException()
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	if (curUser.isPass() == false)
 	{
-		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
+		std::cout << _fd << " : disconnect client" << std::endl;
+		close(_fd);
+		// _DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	return false;

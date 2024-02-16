@@ -9,5 +9,5 @@ class Part : public Command
 	public:
 		Part(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Part();
-		void execute();
+		virtual void execute();
 };

@@ -9,6 +9,5 @@ class Nick : public Command
 	public:
 		Nick( uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Nick();
-
 		virtual void execute();
 };

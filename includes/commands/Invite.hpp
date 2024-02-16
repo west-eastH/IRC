@@ -10,5 +10,5 @@ class Invite : public Command
 	public:
 		Invite(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Invite();
-		void execute();
+		virtual void execute();
 };

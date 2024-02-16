@@ -11,7 +11,6 @@
 #include <string>
 #include <exception>
 #include <vector>
-
 #include <sstream>
 
 #include "UserAccount.hpp"
@@ -30,16 +29,15 @@ class Server{
         uintptr_t			_socketFd;
 		Database*			_DB;
 
-        void create(void);
-        bool isValidPort(char* port);
-        void changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter);
-
-		void		connectClient(std::vector<struct kevent>& changeList);
-        void		disconnectClient(int clientFd);
-		std::vector<std::string> splitBuff(std::string& sendBuffer);
-		Command*	createCommand(uintptr_t fd, std::vector<std::string>& buff);
-        std::vector<Command*> parsingCommand(struct kevent& currEvent);
-		std::vector<std::string> splitSpace(std::string& st);
+        void                        create(void);
+        bool                        isValidPort(char* port);
+        void                        changeEvents(std::vector<struct kevent>& change_list, uintptr_t ident, int16_t filter);
+		void		                connectClient(std::vector<struct kevent>& changeList);
+        void		                disconnectClient(int clientFd);
+		Command*                    createCommand(uintptr_t fd, std::vector<std::string>& buff);
+        std::vector<Command*>       parsingCommand(struct kevent& currEvent);
+		std::vector<std::string>    splitBuff(std::string& sendBuffer);
+		std::vector<std::string>    splitSpace(std::string& st);
 
     public:
         Server(char* port, char* password);

@@ -12,5 +12,5 @@ class Oper : public Command
 	public:
 		Oper(uintptr_t fd, std::vector<std::string> parsedCommand, std::string id, std::string pw);
 		~Oper();
-		void execute();
+		virtual void execute();
 };

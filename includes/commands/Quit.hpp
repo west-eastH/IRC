@@ -10,6 +10,5 @@ class Quit : public Command
 	public:
 		Quit(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Quit();
-
 		virtual void execute();
 };

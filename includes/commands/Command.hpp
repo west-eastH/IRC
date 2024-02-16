@@ -11,11 +11,10 @@ class Command
 
 		Command(uintptr_t fd, std::vector<std::string> parsedCommand);
 		virtual ~Command();
-		
-		uintptr_t	getFd() const;
-		int findNick(const std::string& nick) const;
-		int	findChannel(const std::string& name) const;
-		bool isPrintable(const std::string& str);
-		virtual void execute() = 0;
-		std::string makeMessage(size_t idx);
+		uintptr_t		getFd() const;
+		int 			findNick(const std::string& nick) const;
+		int				findChannel(const std::string& name) const;
+		bool 			isPrintable(const std::string& str);
+		virtual void 	execute() = 0;
+		std::string 	makeMessage(size_t idx);
 };

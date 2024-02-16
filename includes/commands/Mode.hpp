@@ -15,8 +15,9 @@ class Mode : public Command
 		bool changeModeK(Channel& channel, const int opCode, const std::string& param);
 		bool changeModeL(Channel& channel, const int opCode, const std::string& param);
 		bool changeModeO(Channel& channel, const int opCode, const std::string& param);
+	
 	public:
 		Mode(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Mode();
-		void execute();
+		virtual void execute();
 };

@@ -14,7 +14,11 @@ bool Part::handleException()
 		_DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
-
+	if (_parsedCommand.size() != 2)
+	{
+		_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
+		return true;
+	}
 	int channelIdx = findChannel(_parsedCommand[1]);
 	if (channelIdx == -1)
 	{
@@ -23,11 +27,6 @@ bool Part::handleException()
 	}
 	
 	Channel& curChannel = Database::getInstance()->getChannel(channelIdx);
-	if (_parsedCommand.size() != 2)
-	{
-		_DB->sendToClient(_fd, _fd, "461", " :Not enough parameters", SERVER);
-		return true;
-	}
 	if (curChannel.isMemberExists(_fd) == false)
 	{
 		_DB->sendToClient(_fd, _fd, "442", _parsedCommand[1] + " :You're not on that channel", SERVER);

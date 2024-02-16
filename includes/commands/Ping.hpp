@@ -11,5 +11,5 @@ class Ping : public Command
 	public:
 		Ping(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Ping();
-		void execute();
+		virtual void execute();
 };

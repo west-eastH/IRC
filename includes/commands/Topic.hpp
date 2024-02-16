@@ -11,6 +11,5 @@ class Topic : public Command
 	public:
 		Topic(uintptr_t fd, std::vector<std::string> parsedCommand);
 		~Topic();
-
-		void execute();
+		virtual void execute();
 };

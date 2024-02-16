@@ -20,16 +20,14 @@ private:
 	
 public:
 	~Database();
-	static Database* getInstance();
-	void	addAccount(uintptr_t fd);
-	void	deleteAccount(uintptr_t fd);
-	bool	isUserExists(uintptr_t fd);
-	UserAccount&	getAccount(uintptr_t fd);
-
-	void		addChannel(const std::string& name, const std::string& key);
-	Channel&	getChannel(int idx);
-	void		deleteChannel(int idx);
-
-	int		search(const std::string& target, int type);
-	void 	sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag);
+	static Database*	getInstance();
+	void				addAccount(uintptr_t fd);
+	void				deleteAccount(uintptr_t fd);
+	bool				isUserExists(uintptr_t fd);
+	UserAccount&		getAccount(uintptr_t fd);
+	void				addChannel(const std::string& name, const std::string& key);
+	Channel&			getChannel(int idx);
+	void				deleteChannel(int idx);
+	int					search(const std::string& target, int type);
+	void				sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag);
 };

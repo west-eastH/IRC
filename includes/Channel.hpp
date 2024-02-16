@@ -19,7 +19,7 @@ class Channel {
 		std::string	_key;
 		std::string	_topic;
 		std::string	_mode;
-		std::map< uintptr_t, std::pair<bool, bool> > _members; //fd, oper, online
+		std::map< uintptr_t, std::pair<bool, bool> > _members;
 	public:
 		Channel(std::string name, std::string key);
 		~Channel();
