@@ -204,8 +204,6 @@ bool Mode::changeModeL(Channel& channel, const int opCode, const std::string& pa
 
 	if (opCode == '+')
 	{
-		if (pos != std::string::npos)
-			return true;
 		for (size_t i = 0; i < param.length(); i++)
 			if (std::isdigit(param[i]) == 0)
 				return false;

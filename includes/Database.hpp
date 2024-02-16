@@ -8,6 +8,7 @@
 
 #define CLIENT 0
 #define SERVER 1
+#define BOT 2
 
 
 class Database
@@ -29,5 +30,5 @@ public:
 	Channel&			getChannel(int idx);
 	void				deleteChannel(std::string name);
 	int					search(const std::string& target, int type);
-	void				sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag);
+	void				sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, int flag);
 };

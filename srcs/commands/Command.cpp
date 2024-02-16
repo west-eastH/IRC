@@ -28,7 +28,12 @@ std::string Command::makeMessage(size_t idx)
 {
 	std::string msg;
 	for (size_t i = idx; i < _parsedCommand.size(); i++)
-		msg += _parsedCommand[i] + " ";
+	{
+		if (i != _parsedCommand.size() - 1)
+			msg += _parsedCommand[i] + " ";
+		else
+			msg += _parsedCommand[i];
+	}
 	return msg;
 }
 

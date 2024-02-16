@@ -50,7 +50,7 @@ const std::string Channel::generateFormattedMemberNames()
 			users += "@";
 		users += DB->getAccount(it->first).getNickName() + " ";
 	}
-	users.erase(users.find_last_not_of(" ") + 1);
+	users += "MANNER_BOT";
 	return users;
 }
 

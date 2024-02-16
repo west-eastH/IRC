@@ -76,4 +76,5 @@ void Join::execute()
 	std::string members = _DB->getChannel(chIdx).generateFormattedMemberNames();
 	_DB->sendToClient(_fd, _fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
 	_DB->sendToClient(_fd, _fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);
+	_DB->sendToClient(_fd, _fd, "PRIVMSG", " " + _DB->getChannel(chIdx).getName() + " :바른말 고고운운말말", BOT);
 }

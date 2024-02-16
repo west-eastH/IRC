@@ -79,7 +79,6 @@ void Server::start(void)
     if ((kq = kqueue()) == -1)
         throw std::runtime_error("kqueue error");
     changeEvents(changeList, _socketFd, EVFILT_READ);
-    std::cout << "server started" << std::endl;
     while (true)
     {
         newEvents = kevent(kq, &changeList[0], changeList.size(), eventList, 8, NULL);
@@ -201,7 +200,6 @@ void Server::disconnectClient(int clientFd)
 	UserAccount& curUser = DB->getAccount(clientFd);
 	if (curUser.isPass() == false)
 	{
-		std::cout << clientFd << " : disconnect client" << std::endl;
 		close(clientFd);
 		return ;
 	}
@@ -213,7 +211,6 @@ void Server::disconnectClient(int clientFd)
 		if (channel.part(clientFd) == 0)
 			DB->deleteChannel(currentChannelList[i]);
 	}
-    std::cout << clientFd << " : disconnect client" << std::endl;
     close(clientFd);
 	_DB->deleteAccount(clientFd);
 }

@@ -3,7 +3,7 @@
 int main(int ac, char *av[])
 {
 	if (ac != 3)
-		throw std::invalid_argument("Invalid argument!");
+		return 1;
 	try
 	{
 		Server server(av[1], av[2]);

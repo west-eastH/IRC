@@ -58,21 +58,35 @@ int		Database::search(const std::string& target, int type)
 	return -1;
 }
 
-void Database::sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag)
+void Database::sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, int flag)
 {
+	// PRIVMSG test :.DCC SEND tt 2130706433 34429 0.
+
+	// :tt!codespace@127.0.0.1 PRIVMSG test :.DCC SEND tt 2130706433 34429 0.
+
+	// PRIVMSG phan :DCC SEND mew.png 2130706433 55015 610630
+
+	// :dong!dongseo@10.11.9.7 PRIVMSG phan :.DCC SEND mew.png 2130706433 54901 610630.
+
 	std::string prefix;
 	std::string success;
-	UserAccount sender = getAccount(senderFd);
-
-	if (flag == CLIENT)
-	{
-		prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
-		success = ":" + prefix + " " + cmd + params + "\r\n";
-	}
+	UserAccount sender;
+	
+	if (flag == BOT)
+		success = ":MANNER_BOT " + cmd + params + "\r\n";
 	else
 	{
-		prefix = sender.getServerName();
-		success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
+		sender = getAccount(senderFd);
+		if (flag == CLIENT)
+		{
+			prefix = sender.getNickName() + "!" + sender.getUserName() + "@" + sender.getServerName();
+			success = ":" + prefix + " " + cmd + params + "\r\n";
+		}
+		else if (flag == SERVER)
+		{
+			prefix = sender.getServerName();
+			success = ":" + prefix + " " + cmd + " " + sender.getNickName() + " " + params + "\r\n";
+		}
 	}
     const char *msg = success.c_str();
 	int result = send(targetFd, msg, std::strlen(msg), 0);

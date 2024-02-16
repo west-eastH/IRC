@@ -18,7 +18,6 @@ void Quit::execute()
 		if (channel.part(_fd) == 0)
 			Database::getInstance()->deleteChannel(currentChannelList[i]);
 	}
-    std::cout << _fd << " : disconnect client" << std::endl;
 	close(_fd);
 	Database::getInstance()->deleteAccount(_fd);
 }
@@ -28,7 +27,6 @@ bool Quit::handleException()
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
 	if (curUser.isPass() == false)
 	{
-		std::cout << _fd << " : disconnect client" << std::endl;
 		close(_fd);
 		return true;
 	}
