@@ -1,4 +1,5 @@
 #include "UserAccount.hpp"
+#include "Database.hpp"
 
 UserAccount::UserAccount() : _pass(false), _active(false), _root(false), _realName("name"), _userName("user"), _serverName("localhost")
 {
@@ -37,7 +38,7 @@ const std::string &UserAccount::getServerName(void) const
 	return _serverName;
 }
 
-const std::vector<int>& UserAccount::getChannels(void) const
+const std::vector<std::string>& UserAccount::getChannels(void) const
 {
 	return _channels;
 }
@@ -84,15 +85,16 @@ void UserAccount::setServerName(const std::string &serverName)
 
 void UserAccount::addChannel(int idx)
 {
-	_channels.push_back(idx);
+	Database *DB = Database::getInstance();
+	_channels.push_back(DB->getChannel(idx).getName());
 }
 
 void UserAccount::deleteChannel(int idx)
 {
 	if (idx == -1)
 		return ;
-	_channels.erase(_channels.begin() +  idx);
-	// _channels.erase(std::find(_channels.begin(), _channels.end(), idx));
+	Database *DB = Database::getInstance();
+	_channels.erase(std::find(_channels.begin(), _channels.end(), DB->getChannel(idx).getName()));
 }
 
 void UserAccount::activate(void)

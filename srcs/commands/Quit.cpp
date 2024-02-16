@@ -10,10 +10,10 @@ void Quit::execute()
 	if (handleException())
 		return ;
 	UserAccount& curUser = Database::getInstance()->getAccount(_fd);
-	std::vector<int> currentChannelList = curUser.getChannels();
+	std::vector<std::string> currentChannelList = curUser.getChannels();
 	for (size_t i = 0; i < currentChannelList.size(); i++)
 	{
-		Channel& channel = Database::getInstance()->getChannel(currentChannelList[i]);
+		Channel& channel = Database::getInstance()->getChannel(findChannel(currentChannelList[i]));
 		channel.announce(_fd, "PART", " " + channel.getName(), false);
 		if (channel.part(_fd) == 0)
 			Database::getInstance()->deleteChannel(currentChannelList[i]);
@@ -30,7 +30,6 @@ bool Quit::handleException()
 	{
 		std::cout << _fd << " : disconnect client" << std::endl;
 		close(_fd);
-		// _DB->sendToClient(_fd, _fd, "", _parsedCommand[0] + " :You need to pass first", SERVER);
 		return true;
 	}
 	return false;

@@ -27,7 +27,7 @@ public:
 	UserAccount&		getAccount(uintptr_t fd);
 	void				addChannel(const std::string& name, const std::string& key);
 	Channel&			getChannel(int idx);
-	void				deleteChannel(int idx);
+	void				deleteChannel(std::string name);
 	int					search(const std::string& target, int type);
 	void				sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, bool flag);
 };

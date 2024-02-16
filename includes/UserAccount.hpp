@@ -17,7 +17,7 @@ private:
     std::string	_userName;
 	std::string _hostName;
 	std::string _serverName;
-	std::vector<int> _channels;
+	std::vector<std::string> _channels;
 
 public:
     UserAccount();
@@ -30,7 +30,7 @@ public:
     const std::string &getUserName(void) const;
 	const std::string &getHostName(void) const;
 	const std::string &getServerName(void) const;
-	const std::vector<int>& getChannels(void) const;
+	const std::vector<std::string>& getChannels(void) const;
 
     void setNickName(const std::string &nickName);
     void setRealName(const std::string &realName);

@@ -52,10 +52,7 @@ int		Database::search(const std::string& target, int type)
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
 			if (_channels[i].getName() == target)
-			{
-				std::cout << "idx : " << i << std::endl;
 				return i;
-			}
 		}
 	}
 	return -1;
@@ -88,8 +85,9 @@ Channel& Database::getChannel(int idx)
 	return _channels[idx];
 }
 
-void Database::deleteChannel(int idx)
+void Database::deleteChannel(std::string name)
 {
+	int idx = search(name, CHANNEL);
 	if (idx == -1)
 		return ;
 	_channels.erase(_channels.begin() + idx);

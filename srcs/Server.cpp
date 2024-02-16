@@ -25,7 +25,16 @@ Server::~Server() {}
 bool Server::isValidPort(char *port)
 {
     int tempPort;
-    tempPort = std::stoi(port);
+	std::string temp = port;
+
+	if (temp.length() > 5)
+		return false;
+	for (size_t i = 0; i < temp.length(); i++)
+	{
+		if (temp[i] < '0' || temp[i] > '9')
+			return false;
+	}
+    tempPort = std::atoi(port);
     if (tempPort < 0 || tempPort > 65535)
         return false;
     _port = tempPort;
@@ -188,6 +197,22 @@ std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 
 void Server::disconnectClient(int clientFd)
 {
+	Database *DB = Database::getInstance();
+	UserAccount& curUser = DB->getAccount(clientFd);
+	if (curUser.isPass() == false)
+	{
+		std::cout << clientFd << " : disconnect client" << std::endl;
+		close(clientFd);
+		return ;
+	}
+	std::vector<std::string> currentChannelList = curUser.getChannels();
+	for (size_t i = 0; i < currentChannelList.size(); i++)
+	{
+		Channel& channel = DB->getChannel(DB->search(currentChannelList[i], CHANNEL));
+		channel.announce(clientFd, "PART", " " + channel.getName(), false);
+		if (channel.part(clientFd) == 0)
+			DB->deleteChannel(currentChannelList[i]);
+	}
     std::cout << clientFd << " : disconnect client" << std::endl;
     close(clientFd);
 	_DB->deleteAccount(clientFd);
