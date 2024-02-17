@@ -67,6 +67,8 @@ void Join::execute()
 		oper = true;
 	}
 	chIdx = findChannel(_parsedCommand[1]);
+	if (_DB->getChannel(chIdx).isMemberExists(_fd))
+		return ;
 	if (_DB->getAccount(_fd).isRoot() == false && checkChMode(chIdx))
 		return ;
 	_DB->getChannel(chIdx).join(_fd, oper, ONLINE);

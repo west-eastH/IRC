@@ -60,14 +60,6 @@ int		Database::search(const std::string& target, int type)
 
 void Database::sendToClient(uintptr_t senderFd, uintptr_t targetFd, std::string cmd, std::string params, int flag)
 {
-	// PRIVMSG test :.DCC SEND tt 2130706433 34429 0.
-
-	// :tt!codespace@127.0.0.1 PRIVMSG test :.DCC SEND tt 2130706433 34429 0.
-
-	// PRIVMSG phan :DCC SEND mew.png 2130706433 55015 610630
-
-	// :dong!dongseo@10.11.9.7 PRIVMSG phan :.DCC SEND mew.png 2130706433 54901 610630.
-
 	std::string prefix;
 	std::string success;
 	UserAccount sender;

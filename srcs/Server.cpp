@@ -93,37 +93,20 @@ void Server::start(void)
                 if (currEvent->flags == _socketFd)
                     throw std::runtime_error("event error");
                 else
-                {
-                    std::cerr << "client socket error" << std::endl;
                     disconnectClient(currEvent->ident);
-                }
             }
             else if (currEvent->filter == EVFILT_READ)
             {
-				try
-				{
-					if (currEvent->ident == _socketFd)
-						connectClient(changeList);
-					else if (_DB->isUserExists(currEvent->ident) && cmds.empty())
-						cmds = parsingCommand(*currEvent);
-				}
-				catch(const std::exception& e)
-				{
-					std::cerr << e.what() << '\n';
-				}
+				if (currEvent->ident == _socketFd)
+					connectClient(changeList);
+				else if (_DB->isUserExists(currEvent->ident) && cmds.empty())
+					cmds = parsingCommand(*currEvent);
             }
             else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->getFd())
 			{
-				try
-				{
-					for (size_t i = 0; i < cmds.size(); i++)
-						if (cmds[i])
-							cmds[i]->execute();
-				}
-				catch(const std::exception& e)
-				{
-					std::cerr << e.what() << std::endl;
-				}
+				for (size_t i = 0; i < cmds.size(); i++)
+					if (cmds[i])
+						cmds[i]->execute();
 				for (size_t i = 0; i < cmds.size(); i++)
 					if (cmds[i])
 						delete cmds[i];
@@ -140,7 +123,7 @@ void Server::connectClient( std::vector<struct kevent> &changeList)
 {
     uintptr_t clientSocket;
     if ((clientSocket = accept(_socketFd, NULL, NULL)) == -1) 
-        throw std::runtime_error("client connect error");
+        return ;
     fcntl(clientSocket, F_SETFL, O_NONBLOCK);
 
     changeEvents(changeList, clientSocket, EVFILT_READ);
@@ -159,9 +142,7 @@ std::vector<Command*> Server::parsingCommand(struct kevent& currEvent)
 	while (true)
 	{
 		n = recv(currEvent.ident, buf, sizeof(buf) - 1, 0);
-		if (n < 0)
-			throw std::runtime_error("receive error");
-		if (n == 0)
+		if (n <= 0)
 		{
 			disconnectClient(currEvent.ident);
 			cmds.clear();
