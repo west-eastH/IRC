@@ -11,6 +11,8 @@
 #define OPER true
 #define MEMBER false
 
+typedef unsigned long uintptr_t;
+
 class Channel {
 	private:
 		int		 	_limit;

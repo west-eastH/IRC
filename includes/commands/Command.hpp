@@ -1,6 +1,8 @@
 #pragma once
 #include "Server.hpp"
 
+typedef unsigned long uintptr_t;
+
 class Command
 {
 	protected:
