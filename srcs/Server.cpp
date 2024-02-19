@@ -13,15 +13,13 @@
 #include "Part.hpp"
 #include "Quit.hpp"
 
-Server::Server(char* port, char* password) : _serverName("localhost"), _password(password), _rootId("qwer"), _rootPw("1234")
+Server::Server(char* port, char* password) : _serverName("localhost"), _password(password), _rootId("qwer"), _rootPw("1234"), _DB(NULL)
 {
     if (!isValidPort(port))
         throw std::invalid_argument("Wrong port!");
     create();
 }
-
-Server::~Server() {}
-
+Server::~Server(){}
 bool Server::isValidPort(char *port)
 {
     int tempPort;
@@ -112,6 +110,7 @@ void Server::start(void)
 				}
 				catch(const std::exception& e)
 				{
+					disconnectClient(currEvent->ident);
 				}
 				for (size_t i = 0; i < cmds.size(); i++)
 					if (cmds[i])
