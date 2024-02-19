@@ -104,9 +104,15 @@ void Server::start(void)
             }
             else if (currEvent->filter == EVFILT_WRITE && !cmds.empty() && currEvent->ident == cmds.front()->getFd())
 			{
-				for (size_t i = 0; i < cmds.size(); i++)
-					if (cmds[i])
-						cmds[i]->execute();
+				try
+				{
+					for (size_t i = 0; i < cmds.size(); i++)
+						if (cmds[i])
+							cmds[i]->execute();
+				}
+				catch(const std::exception& e)
+				{
+				}
 				for (size_t i = 0; i < cmds.size(); i++)
 					if (cmds[i])
 						delete cmds[i];
