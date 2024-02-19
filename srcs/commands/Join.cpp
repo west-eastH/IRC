@@ -78,5 +78,5 @@ void Join::execute()
 	std::string members = _DB->getChannel(chIdx).generateFormattedMemberNames();
 	_DB->sendToClient(_fd, _fd, "353", "= " + _parsedCommand[1] + " :" + members, SERVER);
 	_DB->sendToClient(_fd, _fd, "366", _parsedCommand[1] + " :End of /NAMES list", SERVER);
-	_DB->sendToClient(_fd, _fd, "PRIVMSG", " " + _DB->getChannel(chIdx).getName() + " :바른말 고고운운말말", BOT);
+	_DB->sendToClient(_fd, _fd, "PRIVMSG", " " + _DB->getChannel(chIdx).getName() + " :바르고 고운말을 사용해주세요 욕설이나 비방시 강퇴 당할 수 있습니다.", BOT);
 }
